@@ -832,7 +832,7 @@ header {
     left: 0;
     right: 0;
     height: 6px;
-    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
+    background: linear-gradient(90deg, #dc2626, #991b1b, #7f1d1d, #450a0a, #1a0000, #000000);
     background-size: 400% 100%;
     animation: gradientFlow 4s ease infinite;
 }
@@ -848,7 +848,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 50%, #000000 100%);
     overflow: hidden;
 }
 

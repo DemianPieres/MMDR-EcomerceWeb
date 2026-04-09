@@ -8,36 +8,77 @@
     <link rel="stylesheet" href="carrito-styles.css">
     <link rel="stylesheet" href="favoritos-styles.css">
     <link rel="stylesheet" href="chatbot.css">
+    <link rel="stylesheet" href="auth-header.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <!-- Main Navigation -->
-        <nav class="main-nav">
+    <!-- Header: una fila — logo + enlaces | buscador centrado | iconos + avatar (último a la derecha) -->
+    <header class="site-header">
+        <nav class="main-nav" aria-label="Principal">
             <div class="nav-content">
-                <div class="logo">
-                    <h1>Inicio</h1>
+                <div class="nav-start">
+                    <button type="button" class="nav-hamburger" id="nav-hamburger" aria-expanded="false" aria-controls="nav-main-links" aria-label="Abrir o cerrar menú">
+                        <span class="nav-hamburger-line"></span>
+                        <span class="nav-hamburger-line"></span>
+                        <span class="nav-hamburger-line"></span>
+                    </button>
+                    <div class="logo">
+                        <a href="inicio.html" class="logo-link"><h1>Inicio</h1></a>
+                    </div>
                 </div>
-                <div class="nav-links">
-                    <a href="inicio.html" class="active">Inicio</a>
-                    <a href="productos.html" onclick="window.location.href='productos.html'; return false;">Productos</a>
-                    <a href="#">Contacto</a>
-                    <a href="#">Mas</a>
-                    <a href="Index.html">Iniciar Sesion</a>
+
+                <div class="nav-links" id="nav-main-links">
+                    <a href="productos.html">Productos</a>
+                    <a href="contacto.html">Contacto</a>
+                    <a href="">Quienes Somos</a>
                 </div>
-                <div class="nav-actions">
+
+                <div class="nav-search-center">
                     <div class="search-bar">
-                        <input type="text" placeholder="Que Estas Buscando?">
-                        <i class="fas fa-search"></i>
+                        <input type="search" name="q" placeholder="¿Qué estás buscando?" autocomplete="off" aria-label="Buscar">
+                        <i class="fas fa-search" aria-hidden="true"></i>
                     </div>
-                    <div class="favoritos-wrapper" id="favoritos-icon">
-                        <i class="fas fa-heart"></i>
-                        <span class="favoritos-badge" style="display: none;">0</span>
+                </div>
+
+                <div class="nav-end">
+                    <div class="nav-actions-icons">
+                        <div class="favoritos-wrapper" id="favoritos-icon">
+                            <i class="fas fa-heart"></i>
+                            <span class="favoritos-badge" style="display: none;">0</span>
+                        </div>
+                        <div class="carrito-wrapper" id="carrito-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge" style="display: none;">0</span>
+                        </div>
                     </div>
-                    <div class="carrito-wrapper" id="carrito-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-badge" style="display: none;">0</span>
+                    <div class="nav-auth-slot nav-auth-slot--actions">
+                        <a href="Index.html" id="nav-auth-login" class="nav-auth-login-link">Iniciar sesión</a>
+                        <div id="nav-auth-user" class="nav-auth-menu nav-auth-hidden">
+                            <button type="button" id="nav-auth-trigger" class="nav-auth-trigger" aria-label="Menú de cuenta" aria-expanded="false" aria-haspopup="true">
+                                <img id="nav-auth-avatar-sm-img" class="nav-auth-avatar-photo nav-auth-hidden" alt="" width="40" height="40" decoding="async">
+                                <span id="nav-auth-avatar-sm" class="nav-auth-avatar-letter">?</span>
+                            </button>
+                            <div class="nav-auth-dropdown" id="nav-auth-dropdown" role="menu">
+                                <div class="nav-auth-dropdown-head">
+                                    <div class="nav-auth-lg-circle">
+                                        <img id="nav-auth-avatar-lg-img" class="nav-auth-avatar-photo-lg nav-auth-hidden" alt="" width="48" height="48" decoding="async">
+                                        <span id="nav-auth-avatar-lg" class="nav-auth-avatar-lg nav-auth-avatar-letter-lg">?</span>
+                                    </div>
+                                    <div class="nav-auth-dropdown-meta">
+                                        <span id="nav-auth-user-name" class="nav-auth-dropdown-name"></span>
+                                        <span id="nav-auth-user-email" class="nav-auth-dropdown-email"></span>
+                                    </div>
+                                </div>
+                                <div class="nav-auth-upload-row">
+                                    <label class="nav-auth-upload-label">
+                                        <input type="file" id="nav-auth-avatar-input" accept="image/jpeg,image/png,image/webp,image/gif" class="nav-auth-file-input">
+                                        <span class="nav-auth-upload-text"><i class="fas fa-camera"></i> Subir foto de perfil</span>
+                                    </label>
+                                    <button type="button" id="nav-auth-avatar-remove-btn" class="nav-auth-remove-btn nav-auth-hidden">Quitar foto</button>
+                                </div>
+                                <button type="button" class="nav-auth-dropdown-logout" id="nav-auth-logout" role="menuitem">Cerrar sesión</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -480,88 +521,34 @@
         </div>
     </div>
 
-    <!-- Chatbot MilO IA -->
-    <div class="chatbot-fab-wrapper">
-        <span class="chatbot-fab-tooltip">¿Tenés alguna duda?</span>
-        <button class="chatbot-fab" id="chatbot-fab" aria-label="Abrir chat">
-            <i class="fas fa-comments"></i>
-        </button>
-    </div>
+    <!-- Chatbot: DOM inyectado por chatbot.js -->
 
-    <div class="chatbot-overlay" id="chatbot-overlay"></div>
-
-    <div class="chatbot-modal" id="chatbot-modal">
-        <!-- Header (común para menú y chat) -->
-        <header class="chatbot-header">
-            <div class="chatbot-header-left">
-                <div class="chatbot-avatar">🤖</div>
-                <div class="chatbot-header-brand">
-                    <span class="chatbot-title">Chateá con MilO IA</span>
-                    <div class="chatbot-header-avatars">
-                        <span class="chatbot-header-avatar"></span>
-                        <span class="chatbot-header-avatar"></span>
-                        <span class="chatbot-header-avatar accent"></span>
-                    </div>
-                </div>
-            </div>
-            <button class="chatbot-close" id="chatbot-close" aria-label="Cerrar chat">✕</button>
-        </header>
-
-        <div class="chatbot-body">
-            <!-- MENÚ INICIAL (interfaz diferente al chat, estilo imagen) -->
-            <div class="chatbot-home" id="chatbot-home">
-                <div class="chatbot-menu-greeting">
-                    <h2 class="chatbot-greeting-hola" id="chatbot-greeting-hola">Hola 👋</h2>
-                    <p class="chatbot-greeting-question">¿Cómo podemos ayudarte?</p>
-                </div>
-
-                <div class="chatbot-menu-cards">
-                    <div class="chatbot-menu-card chatbot-recent-card" id="chatbot-recent-card">
-                        <div class="chatbot-recent-title">Mensaje reciente</div>
-                        <div id="chatbot-recent-content" class="chatbot-recent-inner">
-                            <div class="chatbot-recent-avatars">
-                                <span class="chatbot-recent-av"></span>
-                                <span class="chatbot-recent-av"></span>
-                                <span class="chatbot-recent-av accent"></span>
-                            </div>
-                            <div class="chatbot-recent-info">
-                                <span class="chatbot-recent-name">Chateá con MilO IA</span>
-                                <span class="chatbot-recent-summary" id="chatbot-recent-summary">No hay mensajes recientes</span>
-                            </div>
-                            <span class="chatbot-recent-time" id="chatbot-recent-time"></span>
-                        </div>
-                    </div>
-
-                    <button class="chatbot-menu-card chatbot-send-message-btn" id="chatbot-send-message-btn">
-                        <span>Envíanos un mensaje</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-
-                    <div class="chatbot-menu-card chatbot-welcome-card">
-                        <h3>Te damos la bienvenida a la nueva plataforma 🚀</h3>
-                        <p>Explorá nuestro catálogo de repuestos automotrices y encontrá todo lo que necesitás para tu vehículo.</p>
-                    </div>
-                </div>
-
-                <nav class="chatbot-menu-nav">
-                    <a href="#" class="chatbot-nav-item"><i class="fas fa-home"></i><span>Inicio</span></a>
-                    <a href="#" class="chatbot-nav-item"><i class="fas fa-comments"></i><span>Mensajes</span></a>
-                    <a href="#" class="chatbot-nav-item"><i class="fas fa-question-circle"></i><span>Ayuda</span></a>
-                </nav>
-            </div>
-
-            <!-- ÁREA DE CHAT (conversación con globos) -->
-            <div class="chatbot-conversation" id="chatbot-conversation">
-                <div class="chatbot-messages" id="chatbot-messages"></div>
-                <div class="chatbot-options" id="chatbot-options-container"></div>
-            </div>
-        </div>
-    </div>
-
+    <script>
+        (function () {
+            var btn = document.getElementById('nav-hamburger');
+            var links = document.getElementById('nav-main-links');
+            if (!btn || !links) return;
+            btn.addEventListener('click', function () {
+                var open = links.classList.toggle('nav-links--open');
+                btn.classList.toggle('nav-hamburger--open', open);
+                btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+            links.querySelectorAll('a').forEach(function (a) {
+                a.addEventListener('click', function () {
+                    if (window.matchMedia('(max-width: 992px)').matches) {
+                        links.classList.remove('nav-links--open');
+                        btn.classList.remove('nav-hamburger--open');
+                        btn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            });
+        })();
+    </script>
     <!-- Scripts del Carrito y Favoritos -->
     <script src="carrito-logica.js"></script>
     <script src="favoritos-logica.js"></script>
     <script src="scripts.js"></script>
+    <script src="auth-header.js"></script>
     <script src="chatbot.js"></script>
 </body>
 </html>

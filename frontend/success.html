@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago aprobado - MMDR</title>
+    <link rel="stylesheet" href="checkout-styles.css">
+    <link rel="stylesheet" href="chatbot.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="checkout-result-body">
+    <main class="checkout-result-main">
+        <div class="checkout-result-card success">
+            <i class="fas fa-check-circle"></i>
+            <h1>¡Pago aprobado!</h1>
+            <p>Tu pago fue procesado correctamente por Mercado Pago.</p>
+            <p class="small">
+                Estamos confirmando tu orden en nuestro sistema. La confirmación final se realiza mediante nuestro servidor
+                al recibir el webhook de Mercado Pago.
+            </p>
+            <button class="btn-primary" onclick="window.location.href='productos.html'">
+                Volver a la tienda
+            </button>
+        </div>
+    </main>
+    <script src="chatbot.js"></script>
+</body>
+</html>
+

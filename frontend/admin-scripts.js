@@ -1,7 +1,12 @@
 // Panel de Administrador - Funcionalidad JavaScript con Base de Datos
-document.addEventListener('DOMContentLoaded', function() {
+function initAdminPanelDeferred() {
     // Configuración de la API
-    const API_BASE_URL = 'http://localhost:4000'; // Puerto donde corre el servidor
+    const API_BASE_URL =
+        typeof window.MMDR_API_BASE === 'string' && window.MMDR_API_BASE
+            ? window.MMDR_API_BASE
+            : window.location && window.location.hostname
+              ? `http://${window.location.hostname}:4000`
+              : 'http://localhost:4000';
     
     // Variables globales
     let currentSection = 'inicio';
@@ -13,6 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentProductFilter = 'all';
     let editingProductId = null;
     let dashboardStats = null;
+    let supportTickets = [];
+    let currentTicketDetailId = null;
 
     // Inicializar la aplicación
     initializeApp();
@@ -261,6 +268,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         renderUsersTable();
                     } else if (targetSection === 'productos') {
                         renderProductsTable();
+                    } else if (targetSection === 'tickets') {
+                        loadSupportTickets();
                     }
                 }
             });
@@ -271,6 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const titles = {
             'inicio': 'Dashboard - MMDR E-COMMERCE',
             'usuarios': 'Gestión de Usuarios - MMDR E-COMMERCE',
+            'tickets': 'Gestión de tickets - MMDR E-COMMERCE',
             'productos': 'Gestión de Productos - MMDR E-COMMERCE',
             'insumos': 'Administrar Insumos - MMDR E-COMMERCE',
             'paginas': 'Gestión de Páginas - MMDR E-COMMERCE',
@@ -1130,13 +1140,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===== FUNCIONES DE ANALYTICS Y VENTAS =====
     
     // Cargar estadísticas del dashboard
-    async function loadDashboardStats() {
+    async function loadDashboardStats(year = null) {
         try {
-            // Calcular fechas para el año actual
+            // Calcular fechas para el año especificado o el año actual
             const now = new Date();
-            const currentYear = now.getFullYear();
-            const fechaInicio = new Date(currentYear, 0, 1).toISOString();
-            const fechaFin = new Date(currentYear, 11, 31, 23, 59, 59).toISOString();
+            const targetYear = year || now.getFullYear();
+            const fechaInicio = new Date(targetYear, 0, 1).toISOString();
+            const fechaFin = new Date(targetYear, 11, 31, 23, 59, 59).toISOString();
 
             // Calcular fechas para las últimas 8 semanas
             const fechaInicioSemanas = new Date(now);
@@ -1209,9 +1219,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 dashboardStats = statsData.data;
-                chartData = processRealData(statsData.data, productsData.data, usersData.users || [], ventasMensualesData, ingresosDiariosData);
+                const processedData = processRealData(statsData.data, productsData.data, usersData.users || [], ventasMensualesData, ingresosDiariosData, targetYear);
                 
-                console.log('📊 Datos reales cargados:', chartData);
+                // Guardar datos por año
+                chartDataByYear[targetYear] = processedData;
+                
+                // Si es el año actual, también actualizar chartData
+                if (targetYear === now.getFullYear()) {
+                    chartData = processedData;
+                }
+                
+                console.log(`📊 Datos reales cargados para ${targetYear}:`, processedData);
             } else {
                 throw new Error('Error al cargar datos');
             }
@@ -1222,9 +1240,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Procesar datos reales de la API
-    function processRealData(stats, topProducts, users, ventasMensualesData = [], ingresosDiariosData = []) {
+    function processRealData(stats, topProducts, users, ventasMensualesData = [], ingresosDiariosData = [], targetYear = null) {
         const now = new Date();
-        const currentYear = now.getFullYear();
+        const currentYear = targetYear || now.getFullYear();
         const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
         
         // Procesar productos más vendidos
@@ -1278,8 +1296,10 @@ document.addEventListener('DOMContentLoaded', function() {
             ventasMensualesData.forEach(item => {
                 // El formato viene como 'YYYY-MM'
                 const [year, month] = item._id.split('-');
+                const yearNum = parseInt(year);
                 const mesIndex = parseInt(month) - 1;
-                if (mesIndex >= 0 && mesIndex < 12) {
+                // Solo procesar si el año coincide con el año objetivo
+                if (yearNum === currentYear && mesIndex >= 0 && mesIndex < 12) {
                     ingresosPorMes[mesIndex] = item.ingresos || 0;
                 }
             });
@@ -2552,6 +2572,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let activeUsersChartInstance = null;
     let dailyRevenueChartInstance = null;
     let chartData = null; // Almacenar datos reales
+    let chartDataByYear = {}; // Almacenar datos por año
+    let currentChartYear = new Date().getFullYear(); // Año actual seleccionado para el gráfico
 
     // Datos de ejemplo para cuando no hay conexión
     const sampleData = {
@@ -2596,6 +2618,56 @@ document.addEventListener('DOMContentLoaded', function() {
         createActiveUsersChart();
         createDailyRevenueChart();
         updateStatsSummary();
+        setupYearNavigation();
+    }
+
+    // Configurar navegación por año
+    function setupYearNavigation() {
+        const prevBtn = document.getElementById('prev-year-btn');
+        const nextBtn = document.getElementById('next-year-btn');
+        const yearDisplay = document.getElementById('current-year-display');
+
+        if (!prevBtn || !nextBtn || !yearDisplay) return;
+
+        // Actualizar display del año
+        yearDisplay.textContent = currentChartYear;
+
+        // Función para cambiar de año
+        async function changeYear(direction) {
+            const newYear = currentChartYear + direction;
+            
+            // Limitar rango de años (por ejemplo, 2020-2030)
+            if (newYear < 2020 || newYear > 2030) {
+                return;
+            }
+
+            currentChartYear = newYear;
+            yearDisplay.textContent = currentChartYear;
+
+            // Cargar datos del año si no están en caché
+            if (!chartDataByYear[currentChartYear]) {
+                try {
+                    await loadDashboardStats(currentChartYear);
+                } catch (error) {
+                    console.error('Error cargando datos del año:', error);
+                }
+            }
+
+            // Actualizar gráfico
+            createSalesByMonthChart();
+
+            // Actualizar estado de botones
+            prevBtn.disabled = currentChartYear <= 2020;
+            nextBtn.disabled = currentChartYear >= 2030;
+        }
+
+        // Event listeners
+        prevBtn.addEventListener('click', () => changeYear(-1));
+        nextBtn.addEventListener('click', () => changeYear(1));
+
+        // Actualizar estado inicial de botones
+        prevBtn.disabled = currentChartYear <= 2020;
+        nextBtn.disabled = currentChartYear >= 2030;
     }
 
     // Crear gráfico de ventas por mes (Barras)
@@ -2608,8 +2680,15 @@ document.addEventListener('DOMContentLoaded', function() {
             salesByMonthChartInstance.destroy();
         }
 
-        // Usar datos reales si están disponibles, sino usar datos de ejemplo
-        const dataSource = chartData || sampleData;
+        // Obtener datos del año seleccionado
+        let dataSource;
+        if (chartDataByYear[currentChartYear]) {
+            dataSource = chartDataByYear[currentChartYear];
+        } else if (chartData) {
+            dataSource = chartData;
+        } else {
+            dataSource = sampleData;
+        }
 
         const ctx = canvas.getContext('2d');
         salesByMonthChartInstance = new Chart(ctx, {
@@ -2669,7 +2748,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     title: {
                         display: true,
-                        text: 'Ventas Mensuales del Año',
+                        text: `Ventas Mensuales del Año ${currentChartYear}`,
                         font: {
                             family: 'Inter, sans-serif',
                             size: 18,
@@ -3102,4 +3181,1035 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-});
+    // ===================================================================
+    // ===== SISTEMA DE GESTIÓN DE INVENTARIO =====
+    // ===================================================================
+
+    // Variables globales del inventario
+    let inventoryData = [];
+    let movimientosData = [];
+    let inventoryCurrentPage = 1;
+    let movimientosCurrentPage = 1;
+    let inventoryRefreshInterval = null;
+
+    // Inicializar módulo de inventario
+    function initInventoryModule() {
+        setupInventoryTabs();
+        setupInventoryModals();
+        setupInventoryFilters();
+        loadInventoryData();
+        loadAlertas();
+        
+        // Auto-refresh de movimientos cada 30 segundos
+        inventoryRefreshInterval = setInterval(() => {
+            if (currentSection === 'inventario') {
+                loadMovimientosRecientes();
+            }
+        }, 30000);
+    }
+
+    // Cargar cuando se accede a la sección de inventario
+    document.querySelector('[data-section="inventario"]')?.addEventListener('click', () => {
+        setTimeout(() => {
+            initInventoryModule();
+        }, 100);
+    });
+
+    // ===== TABS DE INVENTARIO =====
+    function setupInventoryTabs() {
+        const tabs = document.querySelectorAll('.inventory-tab');
+        const contents = document.querySelectorAll('.inventory-tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const targetTab = this.dataset.tab;
+
+                // Actualizar tabs activos
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                // Mostrar contenido correspondiente
+                contents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `tab-${targetTab}`) {
+                        content.classList.add('active');
+                    }
+                });
+
+                // Cargar datos según tab
+                if (targetTab === 'productos') {
+                    loadInventoryData();
+                } else if (targetTab === 'movimientos') {
+                    loadMovimientos();
+                } else if (targetTab === 'precios') {
+                    loadPreciosData();
+                }
+            });
+        });
+    }
+
+    // ===== CARGAR DATOS DE INVENTARIO =====
+    async function loadInventoryData() {
+        try {
+            const statusFilter = document.getElementById('inventory-status-filter')?.value || 'all';
+            const categoryFilter = document.getElementById('inventory-category-filter')?.value || 'all';
+            const search = document.getElementById('inventory-search')?.value || '';
+
+            const params = new URLSearchParams({
+                page: inventoryCurrentPage,
+                limit: 15,
+                stockStatus: statusFilter,
+                category: categoryFilter,
+                search: search
+            });
+
+            const response = await fetch(`${API_BASE_URL}/api/inventory?${params}`, {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                inventoryData = data.data;
+                renderInventoryTable();
+                renderInventoryStats(data.estadisticas);
+                renderInventoryPagination(data.pagination);
+            } else {
+                console.error('Error cargando inventario');
+                showNotification('Error al cargar inventario', 'error');
+            }
+        } catch (error) {
+            console.error('Error de conexión:', error);
+            showNotification('Error de conexión con el servidor', 'error');
+        }
+    }
+
+    // ===== RENDERIZAR TABLA DE INVENTARIO =====
+    function renderInventoryTable() {
+        const tbody = document.getElementById('inventory-table-body');
+        if (!tbody) return;
+
+        if (inventoryData.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 2rem; color: #666;">
+                        No se encontraron productos
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = inventoryData.map(producto => {
+            const statusClass = producto.stockStatus || 'sin_stock';
+            const statusText = {
+                'disponible': 'Disponible',
+                'bajo_stock': 'Bajo Stock',
+                'sin_stock': 'Sin Stock'
+            }[statusClass] || 'Sin Stock';
+
+            return `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <img src="${producto.image}" alt="${producto.name}" 
+                                 style="width: 45px; height: 45px; object-fit: cover; border-radius: 8px;"
+                                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2245%22 height=%2245%22%3E%3Crect fill=%22%23f0f0f0%22 width=%2245%22 height=%2245%22/%3E%3C/svg%3E'">
+                            <span style="font-weight: 500;">${producto.name}</span>
+                        </div>
+                    </td>
+                    <td>${formatCategory(producto.category)}</td>
+                    <td style="font-weight: 600; font-size: 16px;">${producto.stock}</td>
+                    <td>${producto.stockMinimo || 5}</td>
+                    <td><span class="stock-badge ${statusClass}">${statusText}</span></td>
+                    <td style="font-weight: 500;">$${formatPrice(producto.price)}</td>
+                    <td>
+                        <div class="inventory-actions">
+                            <button class="btn-entrada" title="Entrada de stock" onclick="openStockModal('${producto._id}', 'entrada')">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="btn-salida" title="Salida de stock" onclick="openStockModal('${producto._id}', 'salida')">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button class="btn-ajuste" title="Ajuste de inventario" onclick="openAjusteModal('${producto._id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // ===== RENDERIZAR ESTADÍSTICAS =====
+    function renderInventoryStats(stats) {
+        if (!stats) return;
+
+        const disponibleEl = document.getElementById('inv-disponible');
+        const bajoStockEl = document.getElementById('inv-bajo-stock');
+        const sinStockEl = document.getElementById('inv-sin-stock');
+        const valorEl = document.getElementById('inv-valor');
+
+        if (disponibleEl) disponibleEl.textContent = stats.estadoStock?.disponible || 0;
+        if (bajoStockEl) bajoStockEl.textContent = stats.estadoStock?.bajoStock || 0;
+        if (sinStockEl) sinStockEl.textContent = stats.estadoStock?.sinStock || 0;
+        if (valorEl) valorEl.textContent = '$' + formatPrice(stats.valorInventario || 0);
+    }
+
+    // ===== CARGAR ALERTAS =====
+    async function loadAlertas() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/inventory/alertas`, {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                renderAlertas(data.data);
+                
+                // Actualizar contador
+                const alertsCount = document.getElementById('alerts-count');
+                if (alertsCount) alertsCount.textContent = data.total || 0;
+            }
+        } catch (error) {
+            console.error('Error cargando alertas:', error);
+        }
+    }
+
+    function renderAlertas(alertas) {
+        const container = document.getElementById('alerts-list');
+        if (!container) return;
+
+        if (!alertas || alertas.length === 0) {
+            container.innerHTML = `
+                <div class="no-alerts">
+                    <i class="fas fa-check-circle"></i>
+                    <p>No hay alertas de inventario</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = alertas.map(alerta => `
+            <div class="alert-item ${alerta.tipo}">
+                <i class="fas ${alerta.tipo === 'critico' ? 'fa-times-circle' : 'fa-exclamation-triangle'}"></i>
+                <span class="alert-text">${alerta.mensaje}</span>
+                <button class="alert-action" onclick="openStockModal('${alerta.producto}', 'entrada')">
+                    Reponer
+                </button>
+            </div>
+        `).join('');
+    }
+
+    // ===== CARGAR MOVIMIENTOS =====
+    async function loadMovimientos() {
+        try {
+            const tipoFilter = document.getElementById('movimiento-tipo-filter')?.value || 'all';
+            const fechaDesde = document.getElementById('movimiento-fecha-desde')?.value || '';
+            const fechaHasta = document.getElementById('movimiento-fecha-hasta')?.value || '';
+
+            const params = new URLSearchParams({
+                page: movimientosCurrentPage,
+                limit: 30,
+                tipo: tipoFilter
+            });
+
+            if (fechaDesde) params.append('fechaInicio', fechaDesde);
+            if (fechaHasta) params.append('fechaFin', fechaHasta);
+
+            const response = await fetch(`${API_BASE_URL}/api/inventory/movimientos?${params}`, {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                movimientosData = data.data;
+                renderMovimientos();
+                renderMovimientosPagination(data.pagination);
+            }
+        } catch (error) {
+            console.error('Error cargando movimientos:', error);
+        }
+    }
+
+    async function loadMovimientosRecientes() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/inventory/movimientos/recientes?limite=20`, {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                movimientosData = data.data;
+                renderMovimientos();
+            }
+        } catch (error) {
+            console.error('Error cargando movimientos recientes:', error);
+        }
+    }
+
+    function renderMovimientos() {
+        const container = document.getElementById('movimientos-timeline');
+        if (!container) return;
+
+        if (!movimientosData || movimientosData.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 3rem; color: #666;">
+                    <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>No hay movimientos registrados</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = movimientosData.map(mov => {
+            const tipoIcon = {
+                'entrada': 'fa-arrow-down',
+                'salida': 'fa-arrow-up',
+                'ajuste': 'fa-sync-alt'
+            }[mov.tipo] || 'fa-exchange-alt';
+
+            const cantidadPrefix = mov.tipo === 'entrada' ? '+' : mov.tipo === 'salida' ? '-' : '';
+            const fecha = new Date(mov.createdAt);
+            const fechaStr = fecha.toLocaleDateString('es-AR') + ' ' + fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+
+            return `
+                <div class="movimiento-item">
+                    <div class="movimiento-icon ${mov.tipo}">
+                        <i class="fas ${tipoIcon}"></i>
+                    </div>
+                    <div class="movimiento-content">
+                        <div class="movimiento-header">
+                            <span class="movimiento-producto">${mov.productoNombre}</span>
+                            <span class="movimiento-fecha">${fechaStr}</span>
+                        </div>
+                        <div class="movimiento-detalles">
+                            ${mov.descripcion || formatMotivo(mov.motivo)}
+                            ${mov.numeroOrden ? `<span style="color: #3498db; margin-left: 8px;">#${mov.numeroOrden}</span>` : ''}
+                        </div>
+                        <div>
+                            <span class="movimiento-cantidad ${mov.tipo}">${cantidadPrefix}${mov.cantidad} unidades</span>
+                            <span class="movimiento-stock">(${mov.stockAnterior} → ${mov.stockNuevo})</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ===== CARGAR DATOS DE PRECIOS =====
+    async function loadPreciosData() {
+        try {
+            const search = document.getElementById('precio-search')?.value || '';
+            
+            const params = new URLSearchParams({
+                page: 1,
+                limit: 50,
+                search: search
+            });
+
+            const response = await fetch(`${API_BASE_URL}/api/inventory?${params}`, {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                renderPreciosTable(data.data);
+            }
+        } catch (error) {
+            console.error('Error cargando precios:', error);
+        }
+    }
+
+    function renderPreciosTable(productos) {
+        const tbody = document.getElementById('precios-table-body');
+        if (!tbody) return;
+
+        if (!productos || productos.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 2rem; color: #666;">
+                        No se encontraron productos
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = productos.map(producto => {
+            const fechaCambio = producto.fechaCambioPrecio 
+                ? new Date(producto.fechaCambioPrecio).toLocaleDateString('es-AR')
+                : '-';
+
+            return `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <img src="${producto.image}" alt="${producto.name}" 
+                                 style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px;">
+                            <span style="font-weight: 500;">${producto.name}</span>
+                        </div>
+                    </td>
+                    <td style="font-weight: 600; color: #27ae60;">$${formatPrice(producto.price)}</td>
+                    <td class="precio-anterior">
+                        ${producto.precioAnterior ? '$' + formatPrice(producto.precioAnterior) : '-'}
+                    </td>
+                    <td class="fecha-cambio">${fechaCambio}</td>
+                    <td>
+                        <div class="precio-input-group">
+                            <input type="number" id="nuevo-precio-${producto._id}" 
+                                   placeholder="${producto.price}" min="0" step="0.01">
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn-cambiar-precio" onclick="cambiarPrecio('${producto._id}')">
+                            <i class="fas fa-check"></i> Aplicar
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // ===== MODALES DE INVENTARIO =====
+    function setupInventoryModals() {
+        // Modal de Stock
+        const stockModal = document.getElementById('stock-modal');
+        const closeStockModal = document.getElementById('close-stock-modal');
+        const cancelStock = document.getElementById('cancel-stock');
+        const stockForm = document.getElementById('stock-form');
+
+        if (closeStockModal) {
+            closeStockModal.addEventListener('click', () => {
+                stockModal.style.display = 'none';
+            });
+        }
+
+        if (cancelStock) {
+            cancelStock.addEventListener('click', () => {
+                stockModal.style.display = 'none';
+            });
+        }
+
+        if (stockForm) {
+            stockForm.addEventListener('submit', handleStockSubmit);
+        }
+
+        // Modal de Ajuste
+        const ajusteModal = document.getElementById('ajuste-modal');
+        const closeAjusteModal = document.getElementById('close-ajuste-modal');
+        const cancelAjuste = document.getElementById('cancel-ajuste');
+        const ajusteForm = document.getElementById('ajuste-form');
+
+        if (closeAjusteModal) {
+            closeAjusteModal.addEventListener('click', () => {
+                ajusteModal.style.display = 'none';
+            });
+        }
+
+        if (cancelAjuste) {
+            cancelAjuste.addEventListener('click', () => {
+                ajusteModal.style.display = 'none';
+            });
+        }
+
+        if (ajusteForm) {
+            ajusteForm.addEventListener('submit', handleAjusteSubmit);
+        }
+
+        // Cerrar modales al hacer clic fuera
+        window.addEventListener('click', (e) => {
+            if (e.target === stockModal) stockModal.style.display = 'none';
+            if (e.target === ajusteModal) ajusteModal.style.display = 'none';
+        });
+    }
+
+    // Abrir modal de stock
+    window.openStockModal = async function(productoId, tipo) {
+        const modal = document.getElementById('stock-modal');
+        if (!modal) return;
+
+        // Obtener datos del producto
+        const producto = inventoryData.find(p => p._id === productoId);
+        if (!producto) {
+            // Cargar del servidor
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/inventory/producto/${productoId}`, {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    fillStockModal(data.data.producto, tipo);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                return;
+            }
+        } else {
+            fillStockModal(producto, tipo);
+        }
+
+        modal.style.display = 'flex';
+    };
+
+    function fillStockModal(producto, tipo) {
+        document.getElementById('stock-producto-id').value = producto._id;
+        document.getElementById('stock-tipo-movimiento').value = tipo;
+        document.getElementById('stock-producto-nombre').textContent = producto.name;
+        document.getElementById('stock-producto-imagen').src = producto.image;
+        document.getElementById('stock-actual').textContent = producto.stock;
+        document.getElementById('stock-cantidad').value = '';
+        document.getElementById('stock-descripcion').value = '';
+
+        // Título del modal
+        document.getElementById('stock-modal-title').textContent = 
+            tipo === 'entrada' ? 'Entrada de Stock' : 'Salida de Stock';
+
+        // Opciones de motivo según tipo
+        const motivoSelect = document.getElementById('stock-motivo');
+        if (tipo === 'entrada') {
+            motivoSelect.innerHTML = `
+                <option value="reposicion">Reposición de mercadería</option>
+                <option value="carga_inicial">Carga inicial</option>
+                <option value="devolucion_cliente">Devolución de cliente</option>
+                <option value="transferencia">Transferencia</option>
+                <option value="otro">Otro</option>
+            `;
+        } else {
+            motivoSelect.innerHTML = `
+                <option value="dano_perdida">Daño o pérdida</option>
+                <option value="transferencia">Transferencia</option>
+                <option value="ajuste_inventario">Ajuste de inventario</option>
+                <option value="otro">Otro</option>
+            `;
+        }
+    }
+
+    // Manejar submit de stock
+    async function handleStockSubmit(e) {
+        e.preventDefault();
+
+        const productoId = document.getElementById('stock-producto-id').value;
+        const tipo = document.getElementById('stock-tipo-movimiento').value;
+        const cantidad = parseInt(document.getElementById('stock-cantidad').value);
+        const motivo = document.getElementById('stock-motivo').value;
+        const descripcion = document.getElementById('stock-descripcion').value;
+
+        if (!cantidad || cantidad <= 0) {
+            showNotification('Ingresa una cantidad válida', 'error');
+            return;
+        }
+
+        try {
+            const endpoint = tipo === 'entrada' ? 'entrada' : 'salida';
+            const response = await fetch(`${API_BASE_URL}/api/inventory/${endpoint}`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productoId,
+                    cantidad,
+                    motivo,
+                    descripcion,
+                    usuario: 'admin'
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                showNotification(data.message, 'success');
+                document.getElementById('stock-modal').style.display = 'none';
+                loadInventoryData();
+                loadAlertas();
+                loadMovimientosRecientes();
+            } else {
+                const error = await response.json();
+                showNotification(error.message || 'Error al registrar movimiento', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification('Error de conexión', 'error');
+        }
+    }
+
+    // Abrir modal de ajuste
+    window.openAjusteModal = async function(productoId) {
+        const modal = document.getElementById('ajuste-modal');
+        if (!modal) return;
+
+        const producto = inventoryData.find(p => p._id === productoId);
+        if (!producto) return;
+
+        document.getElementById('ajuste-producto-id').value = producto._id;
+        document.getElementById('ajuste-producto-nombre').textContent = producto.name;
+        document.getElementById('ajuste-producto-imagen').src = producto.image;
+        document.getElementById('ajuste-stock-actual').textContent = producto.stock;
+        document.getElementById('ajuste-nuevo-stock').value = producto.stock;
+        document.getElementById('ajuste-stock-minimo').value = producto.stockMinimo || 5;
+        document.getElementById('ajuste-descripcion').value = '';
+
+        modal.style.display = 'flex';
+    };
+
+    // Manejar submit de ajuste
+    async function handleAjusteSubmit(e) {
+        e.preventDefault();
+
+        const productoId = document.getElementById('ajuste-producto-id').value;
+        const nuevoStock = parseInt(document.getElementById('ajuste-nuevo-stock').value);
+        const stockMinimo = parseInt(document.getElementById('ajuste-stock-minimo').value);
+        const motivo = document.getElementById('ajuste-motivo').value;
+        const descripcion = document.getElementById('ajuste-descripcion').value;
+
+        if (nuevoStock < 0) {
+            showNotification('El stock no puede ser negativo', 'error');
+            return;
+        }
+
+        try {
+            // Ajustar stock
+            const responseAjuste = await fetch(`${API_BASE_URL}/api/inventory/ajuste`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productoId,
+                    nuevoStock,
+                    motivo,
+                    descripcion,
+                    usuario: 'admin'
+                })
+            });
+
+            // Actualizar stock mínimo
+            if (stockMinimo >= 0) {
+                await fetch(`${API_BASE_URL}/api/inventory/stock-minimo`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productoId, stockMinimo })
+                });
+            }
+
+            if (responseAjuste.ok) {
+                showNotification('Ajuste realizado correctamente', 'success');
+                document.getElementById('ajuste-modal').style.display = 'none';
+                loadInventoryData();
+                loadAlertas();
+                loadMovimientosRecientes();
+            } else {
+                const error = await responseAjuste.json();
+                showNotification(error.message || 'Error al realizar ajuste', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification('Error de conexión', 'error');
+        }
+    }
+
+    // Cambiar precio
+    window.cambiarPrecio = async function(productoId) {
+        const inputId = `nuevo-precio-${productoId}`;
+        const nuevoPrecio = parseFloat(document.getElementById(inputId).value);
+
+        if (!nuevoPrecio || nuevoPrecio <= 0) {
+            showNotification('Ingresa un precio válido', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/inventory/precio`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productoId, nuevoPrecio })
+            });
+
+            if (response.ok) {
+                showNotification('Precio actualizado correctamente', 'success');
+                loadPreciosData();
+            } else {
+                const error = await response.json();
+                showNotification(error.message || 'Error al cambiar precio', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification('Error de conexión', 'error');
+        }
+    };
+
+    // ===== FILTROS DE INVENTARIO =====
+    function setupInventoryFilters() {
+        // Filtros de inventario
+        const statusFilter = document.getElementById('inventory-status-filter');
+        const categoryFilter = document.getElementById('inventory-category-filter');
+        const searchInput = document.getElementById('inventory-search');
+
+        if (statusFilter) {
+            statusFilter.addEventListener('change', () => {
+                inventoryCurrentPage = 1;
+                loadInventoryData();
+            });
+        }
+
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', () => {
+                inventoryCurrentPage = 1;
+                loadInventoryData();
+            });
+        }
+
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    inventoryCurrentPage = 1;
+                    loadInventoryData();
+                }, 300);
+            });
+        }
+
+        // Filtros de movimientos
+        const applyMovFilters = document.getElementById('apply-mov-filters');
+        if (applyMovFilters) {
+            applyMovFilters.addEventListener('click', () => {
+                movimientosCurrentPage = 1;
+                loadMovimientos();
+            });
+        }
+
+        // Búsqueda de precios
+        const precioSearch = document.getElementById('precio-search');
+        if (precioSearch) {
+            let searchTimeout;
+            precioSearch.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    loadPreciosData();
+                }, 300);
+            });
+        }
+
+        // Botón de refresh
+        const refreshBtn = document.getElementById('refresh-inventory-btn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                loadInventoryData();
+                loadAlertas();
+                showNotification('Inventario actualizado', 'success');
+            });
+        }
+    }
+
+    // ===== PAGINACIÓN =====
+    function renderInventoryPagination(pagination) {
+        const container = document.getElementById('inventory-pagination');
+        if (!container || !pagination) return;
+
+        if (pagination.totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="admin-pagination-info">
+                Página <strong>${pagination.currentPage}</strong> de <strong>${pagination.totalPages}</strong>
+            </div>
+            <div class="admin-pagination-buttons">
+                <button class="admin-page-btn" ${pagination.currentPage === 1 ? 'disabled' : ''} 
+                        onclick="inventoryGoToPage(${pagination.currentPage - 1})">
+                    <i class="fas fa-angle-left"></i>
+                </button>
+                <button class="admin-page-btn" ${pagination.currentPage === pagination.totalPages ? 'disabled' : ''} 
+                        onclick="inventoryGoToPage(${pagination.currentPage + 1})">
+                    <i class="fas fa-angle-right"></i>
+                </button>
+            </div>
+        `;
+    }
+
+    function renderMovimientosPagination(pagination) {
+        const container = document.getElementById('movimientos-pagination');
+        if (!container || !pagination) return;
+
+        if (pagination.totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="admin-pagination-info">
+                Página <strong>${pagination.currentPage}</strong> de <strong>${pagination.totalPages}</strong>
+            </div>
+            <div class="admin-pagination-buttons">
+                <button class="admin-page-btn" ${pagination.currentPage === 1 ? 'disabled' : ''} 
+                        onclick="movimientosGoToPage(${pagination.currentPage - 1})">
+                    <i class="fas fa-angle-left"></i>
+                </button>
+                <button class="admin-page-btn" ${pagination.currentPage === pagination.totalPages ? 'disabled' : ''} 
+                        onclick="movimientosGoToPage(${pagination.currentPage + 1})">
+                    <i class="fas fa-angle-right"></i>
+                </button>
+            </div>
+        `;
+    }
+
+    window.inventoryGoToPage = function(page) {
+        inventoryCurrentPage = page;
+        loadInventoryData();
+    };
+
+    window.movimientosGoToPage = function(page) {
+        movimientosCurrentPage = page;
+        loadMovimientos();
+    };
+
+    // ===== FUNCIONES AUXILIARES =====
+    function formatPrice(price) {
+        return new Intl.NumberFormat('es-AR').format(price);
+    }
+
+    function formatCategory(category) {
+        const categories = {
+            'asientos': 'Asientos',
+            'volantes': 'Volantes',
+            'electronica': 'Electrónica',
+            'suspension': 'Suspensión',
+            'accesorios': 'Accesorios',
+            'otros': 'Otros'
+        };
+        return categories[category] || category;
+    }
+
+    function formatMotivo(motivo) {
+        const motivos = {
+            'venta': 'Venta completada',
+            'cancelacion_venta': 'Cancelación de venta',
+            'devolucion_cliente': 'Devolución de cliente',
+            'ajuste_inventario': 'Ajuste de inventario',
+            'carga_inicial': 'Carga inicial',
+            'reposicion': 'Reposición de mercadería',
+            'dano_perdida': 'Daño o pérdida',
+            'transferencia': 'Transferencia',
+            'correccion_error': 'Corrección de error',
+            'otro': 'Otro'
+        };
+        return motivos[motivo] || motivo;
+    }
+
+    // Inicializar módulo al cargar la página si estamos en inventario
+    if (document.getElementById('inventario-section')) {
+        // Esperar a que el DOM esté completamente listo
+        setTimeout(initInventoryModule, 500);
+    }
+
+    // ----- Tickets (atención al cliente) -----
+    function escapeTicketHtml(str) {
+        if (str == null) return '';
+        const div = document.createElement('div');
+        div.textContent = String(str);
+        return div.innerHTML;
+    }
+
+    async function loadSupportTickets() {
+        const sel = document.getElementById('tickets-filter-estado');
+        const estado = sel && sel.value ? sel.value : '';
+        const url = estado
+            ? `${API_BASE_URL}/api/admin/tickets?estado=${encodeURIComponent(estado)}`
+            : `${API_BASE_URL}/api/admin/tickets`;
+        try {
+            const res = await fetch(url, { credentials: 'include' });
+            const data = await res.json();
+            supportTickets = data.success && data.tickets ? data.tickets : [];
+            renderSupportTicketsTable();
+        } catch (e) {
+            console.error(e);
+            showNotification('Error al cargar tickets', 'error');
+            supportTickets = [];
+            renderSupportTicketsTable();
+        }
+    }
+
+    function ticketEstadoPillClass(estado) {
+        const e = String(estado || '');
+        if (e === 'Pendiente') return 'ticket-estado-pill ticket-estado-pill--pendiente';
+        if (e === 'En proceso') return 'ticket-estado-pill ticket-estado-pill--proceso';
+        return 'ticket-estado-pill';
+    }
+
+    function renderSupportTicketsTable() {
+        const tbody = document.getElementById('tickets-table-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        if (!supportTickets.length) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td colspan="5" style="text-align:center;padding:2rem;color:#666;">No hay tickets</td>';
+            tbody.appendChild(tr);
+            return;
+        }
+        supportTickets.forEach((t) => {
+            const u = t.usuarioId;
+            const userLabel = u && (u.name || u.email) ? (u.name || u.email) : (t.guestLabel || 'Invitado');
+            const fecha = t.updatedAt ? new Date(t.updatedAt).toLocaleString('es-AR') : '';
+            const consulta = [t.tipoConsulta, t.mensajeInicial].filter(Boolean).join(' — ').slice(0, 100);
+            const pillClass = ticketEstadoPillClass(t.estado);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${escapeTicketHtml(fecha)}</td>
+                <td>${escapeTicketHtml(userLabel)}</td>
+                <td>${escapeTicketHtml(consulta)}</td>
+                <td><span class="${pillClass}">${escapeTicketHtml(t.estado || '')}</span></td>
+                <td class="admin-actions">
+                    <button type="button" class="admin-action-btn edit ticket-open-btn" data-ticket-id="${t._id}" title="Ver / responder">
+                        <i class="fas fa-comments"></i>
+                    </button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function openTicketModal() {
+        document.getElementById('ticket-detail-modal')?.classList.add('open');
+    }
+
+    function closeTicketModal() {
+        document.getElementById('ticket-detail-modal')?.classList.remove('open');
+        currentTicketDetailId = null;
+    }
+
+    async function openTicketDetail(id) {
+        currentTicketDetailId = id;
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/admin/tickets/${id}`, { credentials: 'include' });
+            const data = await res.json();
+            if (!data.success || !data.ticket) {
+                showNotification('No se pudo cargar el ticket', 'error');
+                return;
+            }
+            const t = data.ticket;
+            const u = t.usuarioId;
+            const userLabel = u && (u.name || u.email) ? `${u.name} (${u.email})` : (t.guestLabel || 'Invitado');
+            document.getElementById('ticket-modal-title').textContent = `Ticket ${t._id}`;
+            document.getElementById('ticket-modal-meta').innerHTML = `
+                <strong>Usuario:</strong> ${escapeTicketHtml(userLabel)}<br>
+                <strong>Creado:</strong> ${escapeTicketHtml(t.createdAt ? new Date(t.createdAt).toLocaleString('es-AR') : '')}<br>
+                <strong>Consulta:</strong> ${escapeTicketHtml(t.tipoConsulta || '')}<br>
+                <strong>Mensaje inicial:</strong> ${escapeTicketHtml(t.mensajeInicial || '')}
+            `;
+            const thread = document.getElementById('ticket-modal-thread');
+            thread.innerHTML = '';
+            (t.mensajes || []).forEach((m) => {
+                const div = document.createElement('div');
+                div.className = `ticket-msg ${m.from === 'admin' ? 'admin' : 'user'}`;
+                const when = m.createdAt ? new Date(m.createdAt).toLocaleString('es-AR') : '';
+                div.innerHTML = `${escapeTicketHtml(m.texto)}<span class="ticket-msg-meta">${m.from === 'admin' ? 'Equipo' : 'Usuario'} · ${escapeTicketHtml(when)}</span>`;
+                thread.appendChild(div);
+            });
+            thread.scrollTop = thread.scrollHeight;
+            const estSel = document.getElementById('ticket-estado-select');
+            if (estSel) estSel.value = t.estado || 'Pendiente';
+            document.getElementById('ticket-reply-text').value = '';
+            openTicketModal();
+        } catch (e) {
+            console.error(e);
+            showNotification('Error al cargar el ticket', 'error');
+        }
+    }
+
+    document.getElementById('tickets-filter-estado')?.addEventListener('change', () => loadSupportTickets());
+    document.getElementById('tickets-refresh-btn')?.addEventListener('click', () => loadSupportTickets());
+    document.getElementById('ticket-modal-close')?.addEventListener('click', closeTicketModal);
+    document.querySelector('#ticket-detail-modal .ticket-modal-backdrop')?.addEventListener('click', closeTicketModal);
+
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.ticket-open-btn');
+        if (btn && btn.dataset.ticketId) {
+            e.preventDefault();
+            openTicketDetail(btn.dataset.ticketId);
+        }
+    });
+
+    document.getElementById('ticket-send-reply-btn')?.addEventListener('click', async () => {
+        if (!currentTicketDetailId) return;
+        const texto = document.getElementById('ticket-reply-text')?.value?.trim();
+        if (!texto) {
+            showNotification('Escribí un mensaje', 'error');
+            return;
+        }
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/admin/tickets/${currentTicketDetailId}/reply`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ texto })
+            });
+            const data = await res.json();
+            if (!data.success) {
+                showNotification(data.message || 'Error al enviar', 'error');
+                return;
+            }
+            showNotification('Respuesta enviada', 'success');
+            await openTicketDetail(currentTicketDetailId);
+            loadSupportTickets();
+        } catch (err) {
+            console.error(err);
+            showNotification('Error de red', 'error');
+        }
+    });
+
+    document.getElementById('ticket-save-estado-btn')?.addEventListener('click', async () => {
+        if (!currentTicketDetailId) return;
+        const estado = document.getElementById('ticket-estado-select')?.value;
+        const id = currentTicketDetailId;
+
+        if (estado === 'Resuelto') {
+            const msg = 'Recordá que una vez guardado como estado resuelto, este ticket desaparecerá y no podrás volver a verlo.';
+            if (!window.confirm(msg)) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/admin/tickets/${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) {
+                    showNotification(data.message || 'No se pudo cerrar el ticket', 'error');
+                    return;
+                }
+                showNotification('Ticket resuelto y archivado', 'success');
+                closeTicketModal();
+                loadSupportTickets();
+            } catch (err) {
+                console.error(err);
+                showNotification('Error de red', 'error');
+            }
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/admin/tickets/${id}`, {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ estado })
+            });
+            const data = await res.json();
+            if (!data.success) {
+                showNotification(data.message || 'Error al actualizar', 'error');
+                return;
+            }
+            showNotification('Estado actualizado', 'success');
+            closeTicketModal();
+            loadSupportTickets();
+        } catch (err) {
+            console.error(err);
+            showNotification('Error de red', 'error');
+        }
+    });
+
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminPanelDeferred);
+} else {
+    initAdminPanelDeferred();
+}

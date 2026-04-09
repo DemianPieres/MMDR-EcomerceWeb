@@ -1,10 +1,9 @@
-// ===== SCRIPT PARA CHECKOUT CON SIMULACIÓN DE PAGO =====
+// ===== CHECKOUT MMDR + Mercado Pago Checkout Pro =====
 
 // Configuración
 const CHECKOUT_CONFIG = {
     API_BASE_URL: 'http://localhost:4000',
-    STORAGE_KEY: 'mmdr_checkout_data',
-    SIMULATION_DELAY: 2000 // 2 segundos de simulación
+    STORAGE_KEY: 'mmdr_checkout_data'
 };
 
 // Variables globales
@@ -88,10 +87,10 @@ function configurarEventosCheckout() {
         form.addEventListener('submit', manejarSubmitFormulario);
     }
 
-    // Formulario de pago con tarjeta
-    const cardForm = document.getElementById('card-payment-form');
-    if (cardForm) {
-        cardForm.addEventListener('submit', manejarPagoConTarjeta);
+    // Botón de pago con Mercado Pago (Checkout Pro)
+    const mpButton = document.getElementById('mp-checkout-button');
+    if (mpButton) {
+        mpButton.addEventListener('click', iniciarPagoMercadoPago);
     }
 
     // Validación en tiempo real para checkout
@@ -101,24 +100,7 @@ function configurarEventosCheckout() {
         input.addEventListener('input', limpiarError);
     });
 
-    // Validación en tiempo real para tarjeta
-    const cardInputs = document.querySelectorAll('#card-payment-form input');
-    cardInputs.forEach(input => {
-        input.addEventListener('blur', validarCampoTarjeta);
-        input.addEventListener('input', limpiarErrorTarjeta);
-    });
-
-    // Formateo automático de número de tarjeta
-    const cardNumberInput = document.getElementById('card-number');
-    if (cardNumberInput) {
-        cardNumberInput.addEventListener('input', formatearNumeroTarjeta);
-    }
-
-    // Formateo automático de fecha de vencimiento
-    const expiryInput = document.getElementById('card-expiry');
-    if (expiryInput) {
-        expiryInput.addEventListener('input', formatearFechaVencimiento);
-    }
+    // Los campos de tarjeta quedan sólo como UI legacy; ya no se validan
 }
 
 // ===== MANEJO DE PASOS =====
@@ -290,17 +272,7 @@ function procederAlPago() {
         return;
     }
 
-    // Mostrar loading
-    const loadingEl = document.querySelector('.payment-loading');
-    const detailsEl = document.getElementById('payment-details');
-    
-    if (loadingEl) loadingEl.style.display = 'block';
-    if (detailsEl) detailsEl.style.display = 'none';
-
-    // Simular procesamiento del pago
-    setTimeout(() => {
-        procesarPagoSimulado();
-    }, CHECKOUT_CONFIG.SIMULATION_DELAY);
+    // Ya no se usa simulación local de pago.
 }
 
 // ===== DATOS DE TARJETAS FICTICIAS =====
@@ -413,35 +385,98 @@ function validarCVV(cvv, numeroTarjeta) {
     }
 }
 
-// ===== SIMULACIÓN DE PAGO =====
+// ===== INTEGRACIÓN CON MERCADO PAGO CHECKOUT PRO =====
 
-async function procesarPagoSimulado() {
+async function iniciarPagoMercadoPago() {
+    if (!checkoutData || !checkoutData.items || checkoutData.items.length === 0) {
+        mostrarNotificacion('No hay productos en el carrito', 'error');
+        return;
+    }
+
     try {
-        console.log('💳 Iniciando simulación de pago...');
-        
-        // Generar datos de la transacción
-        const transaccion = generarTransaccion();
-        
-        // Simular respuesta del pago
-        const resultadoPago = simularRespuestaPago(transaccion);
-        
-        if (resultadoPago.exitoso) {
-            // Guardar venta en la base de datos
-            await guardarVentaEnBD(transaccion);
+        console.log('💳 Iniciando pago con Mercado Pago...');
+
+        const cliente = checkoutData.cliente || {};
+        const payload = {
+            items: checkoutData.items.map(item => ({
+                id: item.id,
+                nombre: item.nombre,
+                precio: item.precio,
+                cantidad: item.cantidad,
+                imagen: item.imagen
+            })),
+            cliente: {
+                nombre: `${cliente.firstName || ''} ${cliente.lastName || ''}`.trim(),
+                email: cliente.email || ''
+            }
+        };
+
+        const response = await fetch(`${CHECKOUT_CONFIG.API_BASE_URL}/api/mercadopago/create-preference`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error del servidor: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.success || !data.init_point) {
+            throw new Error(data.message || 'No se pudo obtener el enlace de pago');
+        }
+
+        // Redirigir a Checkout Pro
+        window.location.href = data.init_point;
+    } catch (error) {
+        console.error('❌ Error iniciando pago con Mercado Pago:', error);
+        mostrarNotificacion('No se pudo iniciar el pago. Intenta nuevamente.', 'error');
+    }
+}
+
+// Validar stock antes de procesar compra
+async function validarStockAntesDeCompra() {
+    if (!checkoutData || !checkoutData.items || checkoutData.items.length === 0) {
+        return { valido: false, mensaje: 'No hay productos en el carrito' };
+    }
+
+    try {
+        const productos = checkoutData.items.map(item => ({
+            id: item.id,
+            cantidad: item.cantidad
+        }));
+
+        const response = await fetch(`${CHECKOUT_CONFIG.API_BASE_URL}/api/inventory/validar-stock`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productos })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
             
-            // Ir al paso de confirmación
-            setTimeout(() => {
-                mostrarPaso(3);
-                mostrarConfirmacion(transaccion);
-            }, 1000);
+            if (!data.todoDisponible) {
+                const sinStock = data.productos.filter(p => !p.disponible);
+                const mensajes = sinStock.map(p => `${p.nombre}: disponible ${p.stockDisponible}`).join(', ');
+                return {
+                    valido: false,
+                    mensaje: `Stock insuficiente: ${mensajes}`,
+                    productos: sinStock
+                };
+            }
             
-        } else {
-            mostrarErrorPago(resultadoPago.mensaje);
+            return { valido: true };
         }
         
+        // Si falla la API, permitir continuar (fallback permisivo)
+        console.warn('⚠️ No se pudo validar stock, continuando con el proceso');
+        return { valido: true };
+        
     } catch (error) {
-        console.error('❌ Error en simulación de pago:', error);
-        mostrarErrorPago('Error interno del sistema');
+        console.warn('⚠️ Error validando stock:', error);
+        // Fallback permisivo en caso de error de conexión
+        return { valido: true };
     }
 }
 

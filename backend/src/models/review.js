@@ -15,19 +15,15 @@ const reviewSchema = new mongoose.Schema({
     required: true,
     trim: true 
   },
-  userEmail: { 
-    type: String,
-    trim: true
-  },
   rating: { 
     type: Number, 
-    required: true, 
     min: 1, 
     max: 5 
   },
   comment: { 
     type: String, 
     trim: true,
+    required: true,
     maxlength: [500, 'El comentario no puede exceder 500 caracteres']
   },
   isModerated: { 
@@ -43,6 +39,7 @@ const reviewSchema = new mongoose.Schema({
 });
 
 reviewSchema.index({ product: 1 });
+reviewSchema.index({ product: 1, createdAt: 1 });
 reviewSchema.index({ user: 1 });
 
 module.exports = mongoose.model('Review', reviewSchema);

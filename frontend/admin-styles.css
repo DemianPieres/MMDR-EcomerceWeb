@@ -1917,3 +1917,831 @@ body {
         margin: 20px;
     }
 }
+
+/* ===== ESTILOS PARA GESTIÓN DE INVENTARIO ===== */
+
+/* Dashboard de Inventario */
+.inventory-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Grid de estadísticas */
+.inventory-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.inventory-stat-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.inventory-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.inventory-stat-card .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #fff;
+}
+
+.inventory-stat-card .stat-icon.disponible {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
+.inventory-stat-card .stat-icon.bajo-stock {
+    background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+}
+
+.inventory-stat-card .stat-icon.sin-stock {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.inventory-stat-card .stat-icon.valor {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+.inventory-stat-card .stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.inventory-stat-card .stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+    line-height: 1;
+}
+
+.inventory-stat-card .stat-label {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-top: 4px;
+}
+
+/* Alertas de Inventario */
+.inventory-alerts-container {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.alerts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.alerts-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    color: #2c3e50;
+}
+
+.alerts-header h3 i {
+    color: #e74c3c;
+}
+
+.alerts-count {
+    background: #e74c3c;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.alerts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.alert-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.alert-item.critico {
+    background: #fdedee;
+    border-left: 4px solid #e74c3c;
+    color: #c0392b;
+}
+
+.alert-item.advertencia {
+    background: #fef9e7;
+    border-left: 4px solid #f39c12;
+    color: #d35400;
+}
+
+.alert-item i {
+    font-size: 18px;
+}
+
+.alert-item .alert-text {
+    flex: 1;
+}
+
+.alert-item .alert-action {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.alert-item.critico .alert-action {
+    background: #e74c3c;
+    color: #fff;
+}
+
+.alert-item.advertencia .alert-action {
+    background: #f39c12;
+    color: #fff;
+}
+
+.alert-item .alert-action:hover {
+    transform: scale(1.05);
+}
+
+.no-alerts {
+    text-align: center;
+    padding: 30px;
+    color: #7f8c8d;
+}
+
+.no-alerts i {
+    font-size: 40px;
+    color: #27ae60;
+    margin-bottom: 10px;
+}
+
+/* Tabs de Inventario */
+.inventory-tabs {
+    display: flex;
+    gap: 10px;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 0;
+}
+
+.inventory-tab {
+    padding: 14px 24px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    color: #7f8c8d;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.inventory-tab:hover {
+    color: #3498db;
+}
+
+.inventory-tab.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+}
+
+.inventory-tab i {
+    font-size: 16px;
+}
+
+/* Contenido de Tabs */
+.inventory-tab-content {
+    display: none;
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.inventory-tab-content.active {
+    display: block;
+}
+
+/* Toolbar de Inventario */
+.inventory-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.inventory-filters {
+    display: flex;
+    gap: 12px;
+}
+
+.inventory-filters select {
+    padding: 10px 16px;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.inventory-filters select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* Tabla de Inventario */
+.inventory-table .stock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.stock-badge.disponible {
+    background: #d5f4e6;
+    color: #27ae60;
+}
+
+.stock-badge.bajo_stock,
+.stock-badge.bajo-stock {
+    background: #fef3cd;
+    color: #d68910;
+}
+
+.stock-badge.sin_stock,
+.stock-badge.sin-stock {
+    background: #fadbd8;
+    color: #c0392b;
+}
+
+/* Acciones de Inventario */
+.inventory-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.inventory-actions button {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.inventory-actions .btn-entrada {
+    background: #d5f4e6;
+    color: #27ae60;
+}
+
+.inventory-actions .btn-entrada:hover {
+    background: #27ae60;
+    color: #fff;
+}
+
+.inventory-actions .btn-salida {
+    background: #fadbd8;
+    color: #e74c3c;
+}
+
+.inventory-actions .btn-salida:hover {
+    background: #e74c3c;
+    color: #fff;
+}
+
+.inventory-actions .btn-ajuste {
+    background: #e8f4fd;
+    color: #3498db;
+}
+
+.inventory-actions .btn-ajuste:hover {
+    background: #3498db;
+    color: #fff;
+}
+
+/* Timeline de Movimientos */
+.movimientos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.movimientos-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    color: #2c3e50;
+}
+
+.movimientos-filters {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.movimientos-filters select,
+.movimientos-filters input[type="date"] {
+    padding: 10px 14px;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.movimientos-filters select:focus,
+.movimientos-filters input[type="date"]:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.btn-filter {
+    padding: 10px 20px;
+    background: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-filter:hover {
+    background: #2980b9;
+}
+
+.movimientos-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.movimiento-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.movimiento-item:hover {
+    background: #ecf0f1;
+}
+
+.movimiento-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.movimiento-icon.entrada {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
+.movimiento-icon.salida {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.movimiento-icon.ajuste {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+.movimiento-content {
+    flex: 1;
+}
+
+.movimiento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+}
+
+.movimiento-producto {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 15px;
+}
+
+.movimiento-fecha {
+    font-size: 12px;
+    color: #95a5a6;
+}
+
+.movimiento-detalles {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-bottom: 4px;
+}
+
+.movimiento-cantidad {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.movimiento-cantidad.entrada {
+    color: #27ae60;
+}
+
+.movimiento-cantidad.salida {
+    color: #e74c3c;
+}
+
+.movimiento-cantidad.ajuste {
+    color: #3498db;
+}
+
+.movimiento-stock {
+    font-size: 13px;
+    color: #95a5a6;
+    margin-left: 12px;
+}
+
+/* Sección de Precios */
+.precios-header {
+    margin-bottom: 20px;
+}
+
+.precios-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    color: #2c3e50;
+}
+
+.precio-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.precio-input-group input {
+    width: 120px;
+    padding: 8px 12px;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: right;
+}
+
+.precio-input-group input:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.btn-cambiar-precio {
+    padding: 8px 16px;
+    background: #9b59b6;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.btn-cambiar-precio:hover {
+    background: #8e44ad;
+}
+
+.precio-anterior {
+    color: #95a5a6;
+    text-decoration: line-through;
+    font-size: 13px;
+}
+
+.fecha-cambio {
+    font-size: 12px;
+    color: #95a5a6;
+}
+
+/* Modal de Stock */
+.stock-producto-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.stock-producto-info img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.stock-producto-info h4 {
+    font-size: 16px;
+    color: #2c3e50;
+    margin-bottom: 4px;
+}
+
+.stock-producto-info p {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+/* Responsive para Inventario */
+@media (max-width: 1024px) {
+    .inventory-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .inventory-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .inventory-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .inventory-filters {
+        flex-direction: column;
+    }
+
+    .inventory-tabs {
+        flex-wrap: wrap;
+    }
+
+    .inventory-tab {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+
+    .movimientos-filters {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .movimientos-filters select,
+    .movimientos-filters input[type="date"] {
+        width: 100%;
+    }
+}
+
+/* ===== Gestión de tickets (atención al cliente) ===== */
+.admin-filter-select {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    background: #fff;
+    min-width: 180px;
+}
+
+.ticket-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.ticket-modal.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ticket-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.ticket-modal-dialog {
+    position: relative;
+    background: #fff;
+    border-radius: 16px;
+    max-width: 720px;
+    width: 100%;
+    max-height: 92vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    animation: ticketModalIn 0.28s ease;
+}
+
+@keyframes ticketModalIn {
+    from { opacity: 0; transform: scale(0.96) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.ticket-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: #fff;
+}
+
+.ticket-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.ticket-modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.ticket-modal-close:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.ticket-modal-body {
+    padding: 22px 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.ticket-meta {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.65;
+}
+
+.ticket-conversation {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 380px;
+    min-height: 200px;
+    overflow-y: auto;
+    padding: 16px;
+    background: #f4f6f8;
+    border-radius: 12px;
+    border: 1px solid #e2e6ea;
+}
+
+.ticket-msg {
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.55;
+    max-width: 95%;
+}
+
+.ticket-msg.user {
+    align-self: flex-end;
+    background: #2c3e50;
+    color: #fff;
+}
+
+.ticket-msg.admin {
+    align-self: flex-start;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    color: #333;
+}
+
+.ticket-msg .ticket-msg-meta {
+    display: block;
+    font-size: 11px;
+    opacity: 0.75;
+    margin-top: 4px;
+}
+
+.ticket-reply-box label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.ticket-reply-box textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.ticket-reply-actions {
+    margin-top: 10px;
+}
+
+.ticket-estado-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+}
+
+.ticket-estado-label {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.ticket-estado-actions select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.ticket-estado-pill {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.ticket-estado-pill--pendiente {
+    background: #fff8e1;
+    color: #f57f17;
+    border: 1px solid #ffe082;
+}
+
+.ticket-estado-pill--proceso {
+    background: #e3f2fd;
+    color: #0277bd;
+    border: 1px solid #81d4fa;
+}

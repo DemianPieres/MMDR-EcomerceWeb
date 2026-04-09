@@ -6,7 +6,8 @@ const CARRITO_CONFIG = {
     STORAGE_KEY: 'mmdr_carrito',
     EXPIRACION_KEY: 'mmdr_carrito_expiracion',
     DURACION_HORAS: 24, // Duración del carrito en horas
-    DURACION_MS: 24 * 60 * 60 * 1000 // 24 horas en milisegundos
+    DURACION_MS: 24 * 60 * 60 * 1000, // 24 horas en milisegundos
+    API_BASE_URL: 'http://localhost:4000'
 };
 
 // ===== CLASE PRINCIPAL DEL CARRITO =====
@@ -77,8 +78,8 @@ class CarritoCompras {
         }
     }
 
-    // Agregar producto al carrito
-    agregarProducto(producto) {
+    // Agregar producto al carrito con validación de stock
+    async agregarProducto(producto) {
         // Verificar que el producto tenga los datos necesarios
         if (!producto || !producto.id) {
             console.error('❌ Producto inválido');
@@ -87,6 +88,17 @@ class CarritoCompras {
 
         // Buscar si el producto ya existe
         const itemExistente = this.items.find(item => item.id === producto.id);
+        const cantidadActual = itemExistente ? itemExistente.cantidad : 0;
+        const cantidadNueva = cantidadActual + 1;
+
+        // Validar stock disponible
+        const stockDisponible = await this.verificarStockProducto(producto.id, cantidadNueva);
+        
+        if (!stockDisponible.disponible) {
+            this.mostrarNotificacion(stockDisponible.mensaje || 'Stock insuficiente', 'error');
+            console.warn(`⚠️ Stock insuficiente para ${producto.nombre || producto.name}`);
+            return false;
+        }
 
         if (itemExistente) {
             // Si existe, aumentar cantidad
@@ -100,6 +112,7 @@ class CarritoCompras {
                 precio: producto.precio || producto.price,
                 imagen: producto.imagen || producto.image,
                 cantidad: 1,
+                stockMaximo: stockDisponible.stockDisponible,
                 agregadoEl: new Date().getTime()
             };
             this.items.push(nuevoItem);
@@ -110,6 +123,71 @@ class CarritoCompras {
         this.actualizarUI();
         
         return true;
+    }
+
+    // Verificar stock de un producto
+    async verificarStockProducto(productoId, cantidadSolicitada) {
+        try {
+            const response = await fetch(`${CARRITO_CONFIG.API_BASE_URL}/api/inventory/validar-stock`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productos: [{ id: productoId, cantidad: cantidadSolicitada }]
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                return data.productos[0] || { disponible: true };
+            }
+            
+            return { disponible: true }; // Si falla la validación, permitir (fallback)
+        } catch (error) {
+            console.warn('⚠️ No se pudo validar stock, permitiendo operación:', error);
+            return { disponible: true }; // Fallback permisivo
+        }
+    }
+
+    // Validar todo el carrito antes de checkout
+    async validarStockCarrito() {
+        if (this.items.length === 0) {
+            return { valido: false, mensaje: 'El carrito está vacío' };
+        }
+
+        try {
+            const productos = this.items.map(item => ({
+                id: item.id,
+                cantidad: item.cantidad
+            }));
+
+            const response = await fetch(`${CARRITO_CONFIG.API_BASE_URL}/api/inventory/validar-stock`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productos })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                
+                if (!data.todoDisponible) {
+                    const sinStock = data.productos.filter(p => !p.disponible);
+                    const mensajes = sinStock.map(p => `${p.nombre}: ${p.mensaje}`);
+                    return {
+                        valido: false,
+                        mensaje: 'Algunos productos no tienen stock suficiente',
+                        productos: sinStock,
+                        detalles: mensajes
+                    };
+                }
+                
+                return { valido: true };
+            }
+            
+            return { valido: true }; // Fallback permisivo
+        } catch (error) {
+            console.warn('⚠️ No se pudo validar stock del carrito:', error);
+            return { valido: true }; // Fallback permisivo
+        }
     }
 
     // Eliminar producto del carrito
@@ -147,10 +225,18 @@ class CarritoCompras {
         return false;
     }
 
-    // Aumentar cantidad en 1
-    aumentarCantidad(productoId) {
+    // Aumentar cantidad en 1 con validación de stock
+    async aumentarCantidad(productoId) {
         const item = this.items.find(item => item.id === productoId);
         if (item) {
+            // Validar stock antes de aumentar
+            const stockDisponible = await this.verificarStockProducto(productoId, item.cantidad + 1);
+            
+            if (!stockDisponible.disponible) {
+                this.mostrarNotificacion(stockDisponible.mensaje || 'Stock máximo alcanzado', 'error');
+                return false;
+            }
+            
             item.cantidad++;
             this.guardarEnStorage();
             this.actualizarUI();

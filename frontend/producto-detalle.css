@@ -386,7 +386,8 @@ body {
 .reviews-summary {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 16px;
     padding-bottom: 20px;
     border-bottom: 1px solid #eee;
     margin-bottom: 20px;
@@ -404,113 +405,130 @@ body {
 
 .reviews-count { font-size: 14px; color: #666; }
 
-.btn-write-review {
-    padding: 10px 20px;
-    background: #3483fa;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
+.reviews-rating-box {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.rating-box-title {
+    font-size: 14px;
+    color: #444;
+    font-weight: 600;
+}
+
+.rating-box-hint {
+    font-size: 12px;
+    color: #666;
+    min-height: 18px;
+}
+
+.reviews-chat-shell {
+    background: #f8f9fa;
+    border: 1px solid #eceff3;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.reviews-list {
+    max-height: 360px;
+    overflow-y: auto;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.review-chat-item {
+    background: #fff;
+    border: 1px solid #e6ebf2;
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.review-chat-head {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 8px;
-}
-
-.btn-write-review:hover { background: #2968c8; }
-
-.review-form-container {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 24px;
-}
-
-.review-form-container h3 { margin-bottom: 16px; }
-
-.form-group {
-    margin-bottom: 16px;
-}
-
-.form-group label {
-    display: block;
     margin-bottom: 6px;
-    font-weight: 500;
 }
 
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+.review-chat-author {
+    font-weight: 600;
     font-size: 14px;
+}
+
+.review-chat-time {
+    font-size: 12px;
+    color: #909090;
 }
 
 .rating-select {
     display: flex;
-    gap: 4px;
-    font-size: 24px;
-    color: #ddd;
-    cursor: pointer;
+    gap: 2px;
 }
 
-.rating-select span:hover,
-.rating-select span.active,
-.rating-select span.active ~ span { color: #ffc107; }
-
-.rating-select span.active,
-.rating-select span.active ~ span { color: #ffc107; }
-.rating-select span i { pointer-events: none; }
-
-.char-count { font-size: 12px; color: #999; float: right; }
-
-.btn-submit-review {
-    padding: 10px 24px;
-    background: #00a650;
-    color: #fff;
+.rating-select button {
     border: none;
-    border-radius: 8px;
-    font-weight: 600;
+    background: transparent;
+    color: #d1d1d1;
     cursor: pointer;
-    margin-right: 12px;
+    font-size: 22px;
+    padding: 2px;
 }
 
-.btn-cancel-review {
-    padding: 10px 24px;
-    background: #ddd;
-    color: #333;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+.rating-select button.active,
+.rating-select button:hover {
+    color: #ffc107;
 }
 
-.review-item {
-    padding: 16px 0;
-    border-bottom: 1px solid #eee;
+.review-chat-message {
+    color: #444;
+    line-height: 1.4;
+    word-break: break-word;
 }
 
-.review-item:last-child { border-bottom: none; }
-
-.review-item-header {
+.review-chat-composer {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    gap: 10px;
+    border-top: 1px solid #eceff3;
+    padding: 10px;
+    background: #fff;
 }
 
-.review-item-author { font-weight: 600; }
+.review-chat-composer input {
+    flex: 1;
+    border: 1px solid #d7dbe2;
+    border-radius: 999px;
+    padding: 11px 14px;
+    font-size: 14px;
+}
 
-.review-item-date { font-size: 12px; color: #999; }
+.review-chat-composer input:focus {
+    outline: none;
+    border-color: #3483fa;
+}
 
-.review-item-stars { color: #ffc107; margin-bottom: 8px; }
-
-.review-item-comment { color: #666; line-height: 1.5; }
+.btn-send-review {
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #3483fa;
+    color: #fff;
+    cursor: pointer;
+}
 
 .reviews-empty {
-    padding: 32px;
+    padding: 26px;
     text-align: center;
     color: #999;
+    background: #fff;
+    border: 1px dashed #dde4ef;
+    border-radius: 10px;
 }
 
 @media (max-width: 768px) {

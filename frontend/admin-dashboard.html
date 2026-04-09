@@ -40,9 +40,17 @@
                     <i class="fas fa-users"></i>
                     <span>Usuarios</span>
                 </a>
+                <a href="#" class="admin-sidebar-link" data-section="tickets">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Gestión de tickets</span>
+                </a>
                 <a href="#" class="admin-sidebar-link" data-section="productos">
                     <i class="fas fa-box"></i>
                     <span>Productos</span>
+                </a>
+                <a href="#" class="admin-sidebar-link" data-section="inventario">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Gestión de Inventario</span>
                 </a>
                 <a href="#" class="admin-sidebar-link" data-section="insumos">
                     <i class="fas fa-list"></i>
@@ -243,6 +251,69 @@
                 </div>
             </section>
 
+            <!-- Tickets / Atención al cliente -->
+            <section id="tickets-section" class="admin-content-section">
+                <div class="admin-section-header">
+                    <h2 class="admin-section-title">Gestión de tickets</h2>
+                    <div class="admin-section-actions">
+                        <select id="tickets-filter-estado" class="admin-filter-select" aria-label="Filtrar por estado">
+                            <option value="">Todos los estados</option>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="En proceso">En proceso</option>
+                        </select>
+                        <button type="button" class="admin-refresh-btn" id="tickets-refresh-btn" title="Actualizar">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="admin-table-container">
+                    <table class="admin-data-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Usuario</th>
+                                <th>Consulta</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tickets-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Modal detalle ticket -->
+            <div id="ticket-detail-modal" class="ticket-modal" aria-hidden="true">
+                <div class="ticket-modal-backdrop"></div>
+                <div class="ticket-modal-dialog">
+                    <div class="ticket-modal-header">
+                        <h3 id="ticket-modal-title">Ticket</h3>
+                        <button type="button" class="ticket-modal-close" id="ticket-modal-close" aria-label="Cerrar">&times;</button>
+                    </div>
+                    <div class="ticket-modal-body">
+                        <div class="ticket-meta" id="ticket-modal-meta"></div>
+                        <div class="ticket-conversation" id="ticket-modal-thread"></div>
+                        <div class="ticket-reply-box">
+                            <label for="ticket-reply-text">Responder al usuario</label>
+                            <textarea id="ticket-reply-text" rows="3" placeholder="Escribí tu respuesta..."></textarea>
+                            <div class="ticket-reply-actions">
+                                <button type="button" class="btn-primary" id="ticket-send-reply-btn">Enviar respuesta</button>
+                            </div>
+                        </div>
+                        <div class="ticket-estado-actions">
+                            <span class="ticket-estado-label">Estado:</span>
+                            <select id="ticket-estado-select">
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="En proceso">En proceso</option>
+                                <option value="Resuelto">Resuelto (cierra y elimina el ticket)</option>
+                            </select>
+                            <button type="button" class="btn-secondary" id="ticket-save-estado-btn">Guardar estado</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Productos Section -->
             <section id="productos-section" class="admin-content-section">
                 <div class="admin-section-header">
@@ -294,6 +365,294 @@
                     <!-- La paginación se generará dinámicamente -->
                 </div>
             </section>
+
+            <!-- ===== SECCIÓN DE GESTIÓN DE INVENTARIO ===== -->
+            <section id="inventario-section" class="admin-content-section">
+                <div class="admin-section-header">
+                    <h2 class="admin-section-title">Gestión de Inventario</h2>
+                    <div class="admin-section-actions">
+                        <button class="admin-refresh-btn" id="refresh-inventory-btn">
+                            <i class="fas fa-sync-alt"></i>
+                            Actualizar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dashboard de Inventario -->
+                <div class="inventory-dashboard">
+                    <!-- Estadísticas rápidas -->
+                    <div class="inventory-stats-grid">
+                        <div class="inventory-stat-card">
+                            <div class="stat-icon disponible">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-number" id="inv-disponible">0</span>
+                                <span class="stat-label">Disponibles</span>
+                            </div>
+                        </div>
+                        <div class="inventory-stat-card">
+                            <div class="stat-icon bajo-stock">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-number" id="inv-bajo-stock">0</span>
+                                <span class="stat-label">Bajo Stock</span>
+                            </div>
+                        </div>
+                        <div class="inventory-stat-card">
+                            <div class="stat-icon sin-stock">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-number" id="inv-sin-stock">0</span>
+                                <span class="stat-label">Sin Stock</span>
+                            </div>
+                        </div>
+                        <div class="inventory-stat-card">
+                            <div class="stat-icon valor">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-number" id="inv-valor">$0</span>
+                                <span class="stat-label">Valor Inventario</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas de inventario -->
+                    <div class="inventory-alerts-container" id="inventory-alerts">
+                        <div class="alerts-header">
+                            <h3><i class="fas fa-bell"></i> Alertas de Inventario</h3>
+                            <span class="alerts-count" id="alerts-count">0</span>
+                        </div>
+                        <div class="alerts-list" id="alerts-list">
+                            <!-- Las alertas se cargarán dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Tabs de navegación -->
+                    <div class="inventory-tabs">
+                        <button class="inventory-tab active" data-tab="productos">
+                            <i class="fas fa-boxes"></i> Stock de Productos
+                        </button>
+                        <button class="inventory-tab" data-tab="movimientos">
+                            <i class="fas fa-exchange-alt"></i> Movimientos
+                        </button>
+                        <button class="inventory-tab" data-tab="precios">
+                            <i class="fas fa-tags"></i> Cambiar Precios
+                        </button>
+                    </div>
+
+                    <!-- Tab: Stock de Productos -->
+                    <div class="inventory-tab-content active" id="tab-productos">
+                        <div class="inventory-toolbar">
+                            <div class="admin-search-bar">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Buscar productos..." id="inventory-search">
+                            </div>
+                            <div class="inventory-filters">
+                                <select id="inventory-status-filter">
+                                    <option value="all">Todos los estados</option>
+                                    <option value="disponible">Disponible</option>
+                                    <option value="bajo_stock">Bajo Stock</option>
+                                    <option value="sin_stock">Sin Stock</option>
+                                </select>
+                                <select id="inventory-category-filter">
+                                    <option value="all">Todas las categorías</option>
+                                    <option value="asientos">Asientos</option>
+                                    <option value="volantes">Volantes</option>
+                                    <option value="electronica">Electrónica</option>
+                                    <option value="suspension">Suspensión</option>
+                                    <option value="accesorios">Accesorios</option>
+                                    <option value="otros">Otros</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="admin-table-container">
+                            <table class="admin-data-table inventory-table">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Categoría</th>
+                                        <th>Stock Actual</th>
+                                        <th>Stock Mínimo</th>
+                                        <th>Estado</th>
+                                        <th>Precio</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventory-table-body">
+                                    <!-- Los productos se cargarán dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="admin-pagination" id="inventory-pagination">
+                            <!-- Paginación dinámica -->
+                        </div>
+                    </div>
+
+                    <!-- Tab: Movimientos en Tiempo Real -->
+                    <div class="inventory-tab-content" id="tab-movimientos">
+                        <div class="movimientos-header">
+                            <h3><i class="fas fa-history"></i> Historial de Movimientos</h3>
+                            <div class="movimientos-filters">
+                                <select id="movimiento-tipo-filter">
+                                    <option value="all">Todos los tipos</option>
+                                    <option value="entrada">Entradas</option>
+                                    <option value="salida">Salidas</option>
+                                    <option value="ajuste">Ajustes</option>
+                                </select>
+                                <input type="date" id="movimiento-fecha-desde" placeholder="Desde">
+                                <input type="date" id="movimiento-fecha-hasta" placeholder="Hasta">
+                                <button class="btn-filter" id="apply-mov-filters">
+                                    <i class="fas fa-filter"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="movimientos-timeline" id="movimientos-timeline">
+                            <!-- Los movimientos se cargarán dinámicamente -->
+                        </div>
+
+                        <div class="admin-pagination" id="movimientos-pagination">
+                            <!-- Paginación dinámica -->
+                        </div>
+                    </div>
+
+                    <!-- Tab: Cambiar Precios -->
+                    <div class="inventory-tab-content" id="tab-precios">
+                        <div class="precios-header">
+                            <h3><i class="fas fa-tags"></i> Gestión de Precios</h3>
+                        </div>
+
+                        <div class="admin-search-bar" style="max-width: 400px; margin-bottom: 1rem;">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Buscar producto para cambiar precio..." id="precio-search">
+                        </div>
+
+                        <div class="admin-table-container">
+                            <table class="admin-data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Precio Actual</th>
+                                        <th>Precio Anterior</th>
+                                        <th>Último Cambio</th>
+                                        <th>Nuevo Precio</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="precios-table-body">
+                                    <!-- Los productos se cargarán dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="admin-pagination" id="precios-pagination">
+                            <!-- Paginación dinámica -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Modal para Entrada/Salida de Stock -->
+            <div id="stock-modal" class="admin-modal">
+                <div class="admin-modal-content">
+                    <div class="admin-modal-header">
+                        <h3 id="stock-modal-title">Movimiento de Stock</h3>
+                        <span class="admin-modal-close" id="close-stock-modal">&times;</span>
+                    </div>
+                    <form id="stock-form" class="admin-form">
+                        <input type="hidden" id="stock-producto-id">
+                        <input type="hidden" id="stock-tipo-movimiento">
+                        
+                        <div class="stock-producto-info">
+                            <img id="stock-producto-imagen" src="" alt="">
+                            <div>
+                                <h4 id="stock-producto-nombre"></h4>
+                                <p>Stock actual: <strong id="stock-actual"></strong></p>
+                            </div>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="stock-cantidad">Cantidad *</label>
+                            <input type="number" id="stock-cantidad" min="1" required>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="stock-motivo">Motivo *</label>
+                            <select id="stock-motivo" required>
+                                <!-- Opciones dinámicas según tipo -->
+                            </select>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="stock-descripcion">Descripción</label>
+                            <textarea id="stock-descripcion" rows="2" placeholder="Descripción opcional..."></textarea>
+                        </div>
+
+                        <div class="admin-form-actions">
+                            <button type="button" class="admin-btn-secondary" id="cancel-stock">Cancelar</button>
+                            <button type="submit" class="admin-btn-primary" id="save-stock">Guardar Movimiento</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal para Ajuste de Stock -->
+            <div id="ajuste-modal" class="admin-modal">
+                <div class="admin-modal-content">
+                    <div class="admin-modal-header">
+                        <h3>Ajuste de Inventario</h3>
+                        <span class="admin-modal-close" id="close-ajuste-modal">&times;</span>
+                    </div>
+                    <form id="ajuste-form" class="admin-form">
+                        <input type="hidden" id="ajuste-producto-id">
+                        
+                        <div class="stock-producto-info">
+                            <img id="ajuste-producto-imagen" src="" alt="">
+                            <div>
+                                <h4 id="ajuste-producto-nombre"></h4>
+                                <p>Stock actual: <strong id="ajuste-stock-actual"></strong></p>
+                            </div>
+                        </div>
+
+                        <div class="admin-form-row">
+                            <div class="admin-form-group">
+                                <label for="ajuste-nuevo-stock">Nuevo Stock *</label>
+                                <input type="number" id="ajuste-nuevo-stock" min="0" required>
+                            </div>
+                            <div class="admin-form-group">
+                                <label for="ajuste-stock-minimo">Stock Mínimo</label>
+                                <input type="number" id="ajuste-stock-minimo" min="0">
+                            </div>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="ajuste-motivo">Motivo *</label>
+                            <select id="ajuste-motivo" required>
+                                <option value="ajuste_inventario">Ajuste por conteo físico</option>
+                                <option value="correccion_error">Corrección de error</option>
+                                <option value="dano_perdida">Daño o pérdida</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="ajuste-descripcion">Descripción</label>
+                            <textarea id="ajuste-descripcion" rows="2" placeholder="Descripción del ajuste..."></textarea>
+                        </div>
+
+                        <div class="admin-form-actions">
+                            <button type="button" class="admin-btn-secondary" id="cancel-ajuste">Cancelar</button>
+                            <button type="submit" class="admin-btn-primary">Guardar Ajuste</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
             <!-- Insumos Section -->
             <section id="insumos-section" class="admin-content-section">
@@ -360,7 +719,15 @@
                         <div class="analytics-card full-width">
                             <div class="analytics-card-header">
                                 <h3><i class="fas fa-chart-bar"></i> Ventas por Mes</h3>
-                                <i class="fas fa-calendar-alt"></i>
+                                <div class="chart-year-navigation">
+                                    <button class="year-nav-btn" id="prev-year-btn" title="Año anterior">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <span class="current-year-display" id="current-year-display">2025</span>
+                                    <button class="year-nav-btn" id="next-year-btn" title="Año siguiente">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="analytics-card-content">
                                 <canvas id="salesByMonthChart"></canvas>
@@ -508,6 +875,6 @@
     </div>
 
     <script src="scripts.js"></script>
-    <script src="admin-scripts.js"></script>
+    <script src="admin-auth-guard.js"></script>
 </body>
 </html>

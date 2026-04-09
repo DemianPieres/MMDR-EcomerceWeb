@@ -1,5 +1,6 @@
 const Sale = require('../models/sale');
 const Product = require('../models/product');
+const InventoryMovement = require('../models/inventoryMovement');
 
 // ===== CONTROLADOR DE VENTAS =====
 
@@ -51,12 +52,39 @@ const crearVenta = async (req, res) => {
 
     const ventaGuardada = await nuevaVenta.save();
 
-    // Actualizar stock de productos
+    // Actualizar stock de productos y registrar movimientos de inventario
     for (const productoVenta of productos) {
-      await Product.findByIdAndUpdate(
-        productoVenta.id,
-        { $inc: { stock: -productoVenta.cantidad } }
-      );
+      const producto = await Product.findById(productoVenta.id);
+      
+      if (producto) {
+        const stockAnterior = producto.stock;
+        const stockNuevo = stockAnterior - productoVenta.cantidad;
+        
+        // Registrar movimiento de inventario
+        const movimiento = new InventoryMovement({
+          producto: productoVenta.id,
+          productoNombre: productoVenta.nombre,
+          tipo: 'salida',
+          cantidad: productoVenta.cantidad,
+          stockAnterior,
+          stockNuevo,
+          motivo: 'venta',
+          descripcion: `Venta completada: Orden ${numeroOrden}`,
+          ventaRef: ventaGuardada._id,
+          numeroOrden: numeroOrden,
+          usuario: 'sistema',
+          origen: 'sistema'
+        });
+        
+        await movimiento.save();
+        
+        // Actualizar stock del producto
+        producto.stock = stockNuevo;
+        producto.actualizarStockStatus();
+        await producto.save();
+        
+        console.log(`📦 Inventario: -${productoVenta.cantidad} ${producto.name} (${stockAnterior} → ${stockNuevo})`);
+      }
     }
 
     console.log('✅ Venta creada exitosamente:', ventaGuardada.numeroOrden);

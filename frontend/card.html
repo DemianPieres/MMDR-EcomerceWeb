@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito - MMDR</title>
     <link rel="stylesheet" href="cart-styles.css">
+    <link rel="stylesheet" href="chatbot.css">
+    <link rel="stylesheet" href="auth-header.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -19,7 +21,24 @@
                 <div class="nav-actions">
                     <a href="inicio.html" class="nav-link">Inicio</a>
                     <a href="productos.html" class="nav-link">Productos</a>
-                    <a href="Index.html" class="nav-link">Mi Cuenta</a>
+                    <div class="nav-auth-slot nav-auth-inline">
+                        <a href="Index.html" class="nav-link nav-auth-login-link" id="nav-auth-login">Iniciar sesión</a>
+                        <div id="nav-auth-user" class="nav-auth-menu nav-auth-hidden">
+                            <button type="button" id="nav-auth-trigger" class="nav-auth-trigger" aria-label="Menú de cuenta" aria-expanded="false" aria-haspopup="true">
+                                <span class="nav-auth-avatar" id="nav-auth-avatar-sm">?</span>
+                            </button>
+                            <div class="nav-auth-dropdown" id="nav-auth-dropdown" role="menu">
+                                <div class="nav-auth-dropdown-head">
+                                    <span class="nav-auth-avatar nav-auth-avatar-lg" id="nav-auth-avatar-lg">?</span>
+                                    <div class="nav-auth-dropdown-meta">
+                                        <span id="nav-auth-user-name" class="nav-auth-dropdown-name"></span>
+                                        <span id="nav-auth-user-email" class="nav-auth-dropdown-email"></span>
+                                    </div>
+                                </div>
+                                <button type="button" class="nav-auth-dropdown-logout" id="nav-auth-logout" role="menuitem">Cerrar sesión</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -105,5 +124,7 @@
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="cart-scripts.js"></script>
+    <script src="auth-header.js"></script>
+    <script src="chatbot.js"></script>
 </body>
 </html>

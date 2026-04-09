@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 const {
   getAllProducts,
   getProductById,
@@ -14,9 +15,9 @@ router.get('/', getAllProducts);
 router.get('/stats', getProductStats);
 router.get('/:id', getProductById);
 
-// Rutas para administración (sin autenticación por ahora, según requerimientos)
-router.post('/', createProduct);
-router.put('/:id', updateProduct);
-router.delete('/:id', deleteProduct);
+// Alta / edición / baja: solo administrador autenticado
+router.post('/', requireAuth, requireAdmin, createProduct);
+router.put('/:id', requireAuth, requireAdmin, updateProduct);
+router.delete('/:id', requireAuth, requireAdmin, deleteProduct);
 
 module.exports = router;

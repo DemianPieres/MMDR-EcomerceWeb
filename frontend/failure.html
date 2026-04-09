@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago rechazado - MMDR</title>
+    <link rel="stylesheet" href="checkout-styles.css">
+    <link rel="stylesheet" href="chatbot.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="checkout-result-body">
+    <main class="checkout-result-main">
+        <div class="checkout-result-card failure">
+            <i class="fas fa-times-circle"></i>
+            <h1>Pago rechazado</h1>
+            <p>Tu pago no pudo ser procesado por Mercado Pago.</p>
+            <p class="small">
+                Podés volver al carrito para intentar nuevamente con otro medio de pago.
+            </p>
+            <button class="btn-primary" onclick="window.location.href='card.html'">
+                Volver al carrito
+            </button>
+        </div>
+    </main>
+    <script src="chatbot.js"></script>
+</body>
+</html>
+

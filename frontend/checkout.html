@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="checkout-styles.css">
     <link rel="stylesheet" href="payment-methods-styles.css">
     <link rel="stylesheet" href="card-payment-styles.css">
+    <link rel="stylesheet" href="chatbot.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -263,80 +264,33 @@
             <div class="checkout-step" id="step-2" style="display: none;">
                 <div class="step-header">
                     <h1>Procesar Pago</h1>
-                    <p>Completa los datos de tu tarjeta para finalizar la compra</p>
+                    <p>Serás redirigido a Mercado Pago para completar el pago de forma segura.</p>
                 </div>
 
                 <div class="payment-content">
                     <div class="payment-form-container">
-                        <!-- Información del método de pago seleccionado -->
                         <div class="selected-payment-method" id="selected-payment-method">
-                            <i class="fas fa-credit-card"></i>
-                            <span>Tarjeta de Crédito</span>
+                            <i class="fas fa-wallet"></i>
+                            <span>Mercado Pago Checkout Pro (Sandbox)</span>
                         </div>
 
-                        <!-- Formulario de datos de tarjeta -->
-                        <form id="card-payment-form" class="card-payment-form">
-                            <div class="form-group">
-                                <label for="card-number">Número de Tarjeta *</label>
-                                <input type="text" id="card-number" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
-                                <span class="error-message"></span>
-                            </div>
+                        <div class="payment-info-text">
+                            <p>
+                                Al continuar, crearemos una orden en nuestro sistema y te llevaremos a la página de
+                                pago de Mercado Pago. La confirmación final de la compra se hace automáticamente
+                                mediante un webhook seguro cuando el pago se aprueba.
+                            </p>
+                        </div>
 
-                            <div class="form-row">
-                                <div class="form-field">
-                                    <label for="card-expiry">Fecha de Vencimiento *</label>
-                                    <input type="text" id="card-expiry" name="cardExpiry" placeholder="MM/AA" maxlength="5" required>
-                                    <span class="error-message"></span>
-                                </div>
-                                <div class="form-field">
-                                    <label for="card-cvv">CVV *</label>
-                                    <input type="text" id="card-cvv" name="cardCvv" placeholder="123" maxlength="4" required>
-                                    <span class="error-message"></span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="cardholder-name">Nombre del Titular *</label>
-                                <input type="text" id="cardholder-name" name="cardholderName" placeholder="Como aparece en la tarjeta" required>
-                                <span class="error-message"></span>
-                            </div>
-
-                            <!-- Tarjetas de prueba -->
-                            <div class="test-cards-section">
-                                <h4>Tarjetas de Prueba</h4>
-                                <div class="test-cards">
-                                    <button type="button" class="test-card-btn" onclick="fillTestCard('visa')">
-                                        <i class="fab fa-cc-visa"></i>
-                                        Visa Prueba
-                                    </button>
-                                    <button type="button" class="test-card-btn" onclick="fillTestCard('mastercard')">
-                                        <i class="fab fa-cc-mastercard"></i>
-                                        Mastercard Prueba
-                                    </button>
-                                    <button type="button" class="test-card-btn" onclick="fillTestCard('amex')">
-                                        <i class="fab fa-cc-amex"></i>
-                                        Amex Prueba
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="form-actions">
-                                <button type="button" class="btn-secondary" onclick="volverAlPaso1()">
-                                    <i class="fas fa-arrow-left"></i>
-                                    Volver
-                                </button>
-                                <button type="submit" class="btn-primary" id="confirm-payment">
-                                    <i class="fas fa-credit-card"></i>
-                                    Confirmar Pago
-                                </button>
-                            </div>
-                        </form>
-
-                        <!-- Loading durante procesamiento -->
-                        <div class="payment-processing" id="payment-processing" style="display: none;">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <h3>Procesando tu pago...</h3>
-                            <p>Por favor espera mientras verificamos tu información</p>
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="volverAlPaso1()">
+                                <i class="fas fa-arrow-left"></i>
+                                Volver
+                            </button>
+                            <button type="button" class="btn-primary" id="mp-checkout-button">
+                                <i class="fas fa-credit-card"></i>
+                                Pagar con Mercado Pago
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -435,5 +389,6 @@
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="carrito-logica.js"></script>
     <script src="checkout-scripts.js"></script>
+    <script src="chatbot.js"></script>
 </body>
 </html>

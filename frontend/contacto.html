@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto - MMDR eCOMECE</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="contacto.css">
+</head>
+<body>
+            <!-- Botón flotante WhatsApp -->
+        <a 
+        href="https://wa.me/5493825419431?text=Hola%2C%20me%20comunico%20desde%20MMDR%20Ecommerce"
+        class="whatsapp-float"
+        target="_blank"
+        aria-label="Chat de WhatsApp"
+        >
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+        </a>
+
+    <!-- Header / Navbar -->
+    <header class="navbar">
+        <div class="container nav-flex">
+            <div class="logo">
+                <span class="logo-icon">m</span> MMDR
+            </div>
+            <nav class="nav-links">
+                <a href="inicio.html">Inicio</a>
+                <a href="productos.html">productos</a>
+            </nav>
+            <div class="nav-actions">
+                <span class="phone-top"><i class="fa-solid fa-phone"></i> +54 3825-419431</span>
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <i class="fa-solid fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="overlay"></div>
+        <div class="hero-content">
+            <h1>Comunicate Con Nosotros</h1>
+        </div>
+    </section>
+
+    <!-- Main Contact Section -->
+    <section class="contact-main">
+        <div class="container grid-contact">
+            
+            <!-- Info Card (Black/Red) -->
+            <div class="info-card">
+                <span class="badge">Contáctanos</span>
+                <h2>¿Necesitas más información? Ponte en contacto</h2>
+                <p>Contáctanos hoy mismo para asesoramiento de compras mayoristas o convenios con MMDR y sus expertos en marketing. ¡Estamos ansiosos por ayudar a que tu negocio crezca!</p>
+                
+                <div class="info-item">
+                    <div class="icon-box"><i class="fa-solid fa-phone"></i></div>
+                    <div>
+                        <p class="label">Número de Teléfono</p>
+                        <p class="value">+54 15 3825-419431</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="icon-box"><i class="fa-solid fa-envelope"></i></div>
+                    <div>
+                        <p class="label">Correo Electrónico</p>
+                        <p class="value">mmdrecomerce@gmail.com</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="icon-box"><i class="fa-solid fa-location-dot"></i></div>
+                    <div>
+                        <p class="label">Ubicación de la Sucursal</p>
+                        <p class="value">RN40 331, F5360 Chilecito, La Rioja</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="form-container">
+                <span class="sub-title">Ponte en contacto</span>
+                <h3>Enviar Mensaje</h3>
+                <p>Por favor, completa el siguiente formulario con tus datos y mensaje, y nuestro equipo te responderá lo antes posible.</p>
+                
+                <form id="contactForm" class="contact-form">
+                    <div class="form-row">
+                        <input type="text" placeholder="Nombre*" required>
+                        <input type="text" placeholder="Apellido*" required>
+                    </div>
+                    <div class="form-row">
+                        <input type="email" placeholder="Correo Electrónico*" required>
+                        <input type="tel" placeholder="Teléfono*">
+                    </div>
+                    <textarea placeholder="Escribe tu mensaje" rows="5"></textarea>
+                    <button type="submit" class="btn-submit">Enviar Mensaje</button>
+                </form>
+            </div>
+
+        </div>
+    </section>
+    
+    <!-- Trusted By Section (Nueva con carrusel) -->
+    <section class="trusted-by">
+        <div class="container flex-brands">
+            <span class="trusted-text">Con la confianza de +100 Marcas</span>
+    
+            <div class="brands-carousel">
+                <div class="brand-track">
+                    <!-- Logos -->
+                    <img src="Imagenes/Marca01.svg" class="brand-logo" />
+                    <img src="Imagenes/Marca02.svg" class="brand-logo" />
+                    <img src="Imagenes/Marca03.svg" class="brand-logo" />
+                    <img src="Imagenes/Marca04.svg" class="brand-logo" />
+                    <img src="Imagenes/Marca05.svg" class="brand-logo" />
+    
+                    <!-- Mas logos -->
+                    <img src="Imagenes/Marca06.svg" class="brand-logo" />
+                    <img src="Imagenes/Marca07.svg" class="brand-logo" />
+                    <img src="Imagenes/Marca08.svg" class="brand-logo" />
+                    <img src="Imagenes/Marca09.svg" class="brand-logo" />
+                    <img src="Imagenes/Marca10.svg" class="brand-logo" />
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Map Section -->
+    <section class="map-section">
+        <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15907.502856216447!2d-74.0722!3d4.5981!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f99a3862900c1%3A0x6b7729f273291176!2sPlaza%20de%20Bol%C3%ADvar!5e0!3m2!1ses!2sco!4v1711111111111!5m2!1ses!2sco" 
+            width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy">
+        </iframe>
+    </section>
+
+    <!-- Support Bar -->
+    <section class="support-bar">
+        <div class="container support-flex">
+            <h2>¿Todavia no Creaste tu Cuenta? <br> Inicia Sesion y Accede a Promociones Unicas!!</h2>
+            <div class="newsletter">
+                <input type="email" placeholder="Ingresa tu correo">
+                <button>Crear Cuenta</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-about">
+                <div class="logo white">
+                    <span class="logo-icon red">m</span> MMDR
+                </div>
+                <p>Somos tu tienda de confianza, con envios a todo el pais 🇦🇷🌍</p>
+            </div>
+            <div class="footer-links">
+                <h4>Enlaces Rápidos</h4>
+                <ul>
+                    <li><a href="inicio.html">Inicio</a></li>
+                    <li><a href="productos.html">productos</a></li>
+                    <li><a href="#">Mas</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Soporte</h4>
+                <ul>
+                    <li><a href="#">Ayuda</a></li>
+                    <li><a href="#">Guías</a></li>
+                    <li><a href="#">Comunidad</a></li>
+                    <li><a href="#">Términos</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h4>Contacto</h4>
+                <p>mmdrecomerce@gmail.com</p>
+                <p>+54 3825-419431</p>
+                <p>RN40 331, F5360 Chilecito, La Rioja</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026. Innova+ Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

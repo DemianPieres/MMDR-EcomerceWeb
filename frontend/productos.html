@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="productos-styles.css">
     <link rel="stylesheet" href="carrito-styles.css">
     <link rel="stylesheet" href="favoritos-styles.css">
+    <link rel="stylesheet" href="chatbot.css">
+    <link rel="stylesheet" href="auth-header.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/ogl@0.0.100/dist/ogl.umd.js"></script>
 </head>
@@ -23,7 +25,35 @@
                     <a href="productos.html" class="active">Productos</a>
                     <a href="#">Contacto</a>
                     <a href="#">Mas</a>
-                    <a href="Index.html">Iniciar Sesion</a>
+                    <div class="nav-auth-slot">
+                        <a href="Index.html" id="nav-auth-login" class="nav-auth-login-link">Iniciar sesión</a>
+                        <div id="nav-auth-user" class="nav-auth-menu nav-auth-hidden">
+                            <button type="button" id="nav-auth-trigger" class="nav-auth-trigger" aria-label="Menú de cuenta" aria-expanded="false" aria-haspopup="true">
+                                <img id="nav-auth-avatar-sm-img" class="nav-auth-avatar-photo nav-auth-hidden" alt="" width="40" height="40" decoding="async">
+                                <span id="nav-auth-avatar-sm" class="nav-auth-avatar-letter">?</span>
+                            </button>
+                            <div class="nav-auth-dropdown" id="nav-auth-dropdown" role="menu">
+                                <div class="nav-auth-dropdown-head">
+                                    <div class="nav-auth-lg-circle">
+                                        <img id="nav-auth-avatar-lg-img" class="nav-auth-avatar-photo-lg nav-auth-hidden" alt="" width="48" height="48" decoding="async">
+                                        <span id="nav-auth-avatar-lg" class="nav-auth-avatar-lg nav-auth-avatar-letter-lg">?</span>
+                                    </div>
+                                    <div class="nav-auth-dropdown-meta">
+                                        <span id="nav-auth-user-name" class="nav-auth-dropdown-name"></span>
+                                        <span id="nav-auth-user-email" class="nav-auth-dropdown-email"></span>
+                                    </div>
+                                </div>
+                                <div class="nav-auth-upload-row">
+                                    <label class="nav-auth-upload-label">
+                                        <input type="file" id="nav-auth-avatar-input" accept="image/jpeg,image/png,image/webp,image/gif" class="nav-auth-file-input">
+                                        <span class="nav-auth-upload-text"><i class="fas fa-camera"></i> Subir foto de perfil</span>
+                                    </label>
+                                    <button type="button" id="nav-auth-avatar-remove-btn" class="nav-auth-remove-btn nav-auth-hidden">Quitar foto</button>
+                                </div>
+                                <button type="button" class="nav-auth-dropdown-logout" id="nav-auth-logout" role="menuitem">Cerrar sesión</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="nav-actions">
                     <div class="search-bar">
@@ -138,5 +168,7 @@
     <script src="carrito-logica.js"></script>
     <script src="favoritos-logica.js"></script>
     <script src="productos-scripts-simple.js"></script>
+    <script src="auth-header.js"></script>
+    <script src="chatbot.js"></script>
 </body>
 </html>

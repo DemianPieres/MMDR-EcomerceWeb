@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 const {
   crearVenta,
   obtenerVentas,
@@ -14,33 +15,20 @@ const {
 
 // ===== RUTAS DE VENTAS =====
 
-// Crear nueva venta
+// Crear nueva venta (checkout / tienda)
 router.post('/', crearVenta);
 
-// Obtener todas las ventas (con filtros y paginación)
-router.get('/', obtenerVentas);
+// Listados, detalle y analytics: solo administrador
+router.get('/', requireAuth, requireAdmin, obtenerVentas);
+router.get('/orden/:numeroOrden', requireAuth, requireAdmin, obtenerVentaPorNumeroOrden);
+router.put('/:id/estado', requireAuth, requireAdmin, actualizarEstadoVenta);
 
-// Obtener venta por ID
-router.get('/:id', obtenerVentaPorId);
+router.get('/analytics/estadisticas', requireAuth, requireAdmin, obtenerEstadisticas);
+router.get('/analytics/productos-mas-vendidos', requireAuth, requireAdmin, obtenerProductosMasVendidos);
+router.get('/analytics/ventas-por-periodo', requireAuth, requireAdmin, obtenerVentasPorPeriodo);
+router.get('/analytics/dashboard', requireAuth, requireAdmin, obtenerEstadisticasDashboard);
 
-// Obtener venta por número de orden
-router.get('/orden/:numeroOrden', obtenerVentaPorNumeroOrden);
-
-// Actualizar estado de venta
-router.put('/:id/estado', actualizarEstadoVenta);
-
-// ===== RUTAS DE ANALYTICS =====
-
-// Obtener estadísticas generales
-router.get('/analytics/estadisticas', obtenerEstadisticas);
-
-// Obtener productos más vendidos
-router.get('/analytics/productos-mas-vendidos', obtenerProductosMasVendidos);
-
-// Obtener ventas por período
-router.get('/analytics/ventas-por-periodo', obtenerVentasPorPeriodo);
-
-// Obtener estadísticas para dashboard
-router.get('/analytics/dashboard', obtenerEstadisticasDashboard);
+// Obtener venta por ID (después de rutas más específicas)
+router.get('/:id', requireAuth, requireAdmin, obtenerVentaPorId);
 
 module.exports = router;

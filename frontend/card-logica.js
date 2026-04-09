@@ -99,9 +99,13 @@ function crearFilaProducto(item) {
 }
 
 // ===== MODIFICAR CANTIDAD =====
-function modificarCantidad(productoId, accion) {
+async function modificarCantidad(productoId, accion) {
     if (accion === 'aumentar') {
-        carrito.aumentarCantidad(productoId);
+        const resultado = await carrito.aumentarCantidad(productoId);
+        if (!resultado) {
+            // Si no se pudo aumentar (stock insuficiente), no hacer nada más
+            return;
+        }
     } else if (accion === 'disminuir') {
         carrito.disminuirCantidad(productoId);
     }
@@ -184,7 +188,7 @@ function limpiarCarritoCompleto() {
 }
 
 // ===== PROCEDER AL CHECKOUT =====
-function irAlCheckout() {
+async function irAlCheckout() {
     const items = carrito.obtenerItems();
     
     if (items.length === 0) {
@@ -192,8 +196,49 @@ function irAlCheckout() {
         return;
     }
     
-    // Redirigir a la página de checkout
-    window.location.href = 'checkout.html';
+    // Mostrar loading
+    const btnCheckout = document.getElementById('btn-checkout') || document.querySelector('.btn-checkout');
+    if (btnCheckout) {
+        btnCheckout.disabled = true;
+        btnCheckout.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validando stock...';
+    }
+    
+    try {
+        // Validar stock antes de ir al checkout
+        const validacion = await carrito.validarStockCarrito();
+        
+        if (!validacion.valido) {
+            let mensaje = 'Algunos productos no tienen stock suficiente:\n\n';
+            if (validacion.detalles) {
+                mensaje += validacion.detalles.join('\n');
+            }
+            alert(mensaje);
+            
+            if (btnCheckout) {
+                btnCheckout.disabled = false;
+                btnCheckout.innerHTML = 'Proceder al Checkout <i class="fas fa-arrow-right"></i>';
+            }
+            return;
+        }
+        
+        // Guardar datos para el checkout
+        const checkoutData = {
+            items: items,
+            subtotal: carrito.calcularSubtotal(),
+            envio: 0,
+            total: carrito.calcularTotal()
+        };
+        
+        localStorage.setItem('mmdr_checkout_data', JSON.stringify(checkoutData));
+        
+        // Redirigir a la página de checkout
+        window.location.href = 'checkout.html';
+        
+    } catch (error) {
+        console.error('Error validando stock:', error);
+        // Permitir continuar si hay error de validación
+        window.location.href = 'checkout.html';
+    }
 }
 
 // ===== CONTINUAR COMPRANDO =====

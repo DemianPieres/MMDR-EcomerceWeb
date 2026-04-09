@@ -2,9 +2,22 @@
  * Página de detalle de producto - Datos dinámicos desde API
  */
 
-const API_BASE_URL = 'http://localhost:4000';
+function resolveApiBaseUrl() {
+    if (typeof window === 'undefined') return 'http://localhost:4000';
+    if (window.MMDR_API_BASE) return window.MMDR_API_BASE;
+    const h = window.location.hostname;
+    return h ? `http://${h}:4000` : 'http://localhost:4000';
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
+if (typeof window !== 'undefined') {
+    window.MMDR_API_BASE = API_BASE_URL;
+}
 let productoActual = null;
 let ratingSeleccionado = 0;
+let pollingResenasId = null;
+const REVIEW_REFRESH_MS = 8000;
+const GUEST_REVIEW_NAME_KEY = 'mmdr_guest_review_name';
 
 // Obtener ID de producto desde URL
 function getProductId() {
@@ -35,8 +48,8 @@ async function cargarProducto() {
         const json = await res.json();
         productoActual = json.data || json;
         renderizarProducto();
+        inicializarResenas();
         cargarProductosRelacionados();
-        cargarResenas();
     } catch (err) {
         console.error('Error cargando producto:', err);
         mostrarError();
@@ -236,119 +249,233 @@ function mostrarNotificacion(msg, tipo) {
 
 // ===== RESEÑAS =====
 
+function inicializarResenas() {
+    configurarInputChatResena();
+    configurarSelectorRating();
+    void cargarResenas();
+    iniciarPollingResenas();
+}
+
 async function cargarResenas() {
     const id = productoActual?._id;
     if (!id) return;
 
     try {
-        const res = await fetch(`${API_BASE_URL}/api/reviews/product/${id}`);
+        const res = await fetch(`${API_BASE_URL}/api/reviews/product/${id}`, { credentials: 'include' });
         const json = await res.json();
-        const reviews = json.data || [];
-        const stats = json.stats || { avgRating: productoActual?.rating || 0, totalReviews: reviews.length };
-
-        document.getElementById('reviews-avg').textContent = stats.avgRating?.toFixed(1) || '0';
-        document.getElementById('reviews-count').textContent = `${stats.totalReviews || reviews.length} reseñas`;
-
-        const starsEl = document.getElementById('reviews-stars');
-        const r = Math.round(stats.avgRating || 0);
-        starsEl.innerHTML = '<i class="fas fa-star"></i>'.repeat(r) + '<i class="far fa-star"></i>'.repeat(5 - r);
-
-        const listEl = document.getElementById('reviews-list');
-        if (reviews.length === 0) {
-            listEl.innerHTML = '<div class="reviews-empty">No hay reseñas aún. ¡Sé el primero en opinar!</div>';
-        } else {
-            listEl.innerHTML = reviews.map(r => `
-                <div class="review-item" data-review-id="${r._id}">
-                    <div class="review-item-header">
-                        <span class="review-item-author">${r.userName || 'Anónimo'}</span>
-                        <span class="review-item-date">${formatearFecha(r.createdAt)}</span>
-                    </div>
-                    <div class="review-item-stars">${'<i class="fas fa-star"></i>'.repeat(r.rating)}${'<i class="far fa-star"></i>'.repeat(5 - r.rating)}</div>
-                    ${r.comment ? `<p class="review-item-comment">${r.comment}</p>` : ''}
-                </div>
-            `).join('');
+        if (!res.ok || !json.success) {
+            throw new Error(json.message || 'No se pudieron cargar las reseñas');
         }
+
+        const reviews = json.data || [];
+        const stats = json.stats || { avgRating: 0, totalRatings: 0 };
+        ratingSeleccionado = Number(json.userRating || 0);
+
+        renderizarResumenRating(stats);
+        renderizarListaResenas(reviews);
+        actualizarEstrellasInput(ratingSeleccionado);
+        actualizarHintRating();
     } catch (err) {
         console.error('Error cargando reseñas:', err);
         document.getElementById('reviews-list').innerHTML = '<div class="reviews-empty">No se pudieron cargar las reseñas.</div>';
     }
-
-    configurarFormularioResena();
 }
 
-function formatearFecha(dateStr) {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' });
+function renderizarResumenRating(stats) {
+    const avg = Number(stats.avgRating || 0);
+    const total = Number(stats.totalRatings || 0);
+
+    document.getElementById('reviews-avg').textContent = avg.toFixed(1);
+    document.getElementById('reviews-count').textContent = `${total} valoraciones`;
+
+    const starsEl = document.getElementById('reviews-stars');
+    const full = Math.round(avg);
+    starsEl.innerHTML = '<i class="fas fa-star"></i>'.repeat(full) + '<i class="far fa-star"></i>'.repeat(5 - full);
 }
 
-function configurarFormularioResena() {
-    const btnEscribir = document.getElementById('btn-write-review');
-    const formContainer = document.getElementById('review-form-container');
-    const form = document.getElementById('review-form');
-    const btnCancel = document.getElementById('btn-cancel-review');
-    const ratingSelect = document.getElementById('rating-select');
-    const charCount = document.getElementById('review-char-count');
-    const textarea = document.getElementById('review-comment');
+function renderizarListaResenas(reviews) {
+    const listEl = document.getElementById('reviews-list');
+    if (!reviews.length) {
+        listEl.innerHTML = '<div class="reviews-empty">Todavía no hay mensajes. ¡Escribí el primero!</div>';
+        return;
+    }
 
-    btnEscribir?.addEventListener('click', () => {
-        formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
-        ratingSeleccionado = 0;
-        actualizarEstrellasInput(0);
-        form?.reset();
-        charCount.textContent = '0';
-    });
+    listEl.innerHTML = reviews.map((review) => `
+        <article class="review-chat-item" data-review-id="${review._id}">
+            <header class="review-chat-head">
+                <span class="review-chat-author">${review.userName || 'Anónimo'}</span>
+                <time class="review-chat-time">${formatearFechaHora(review.createdAt)}</time>
+            </header>
+            <p class="review-chat-message">${escapeHtml(review.comment || '')}</p>
+        </article>
+    `).join('');
+    listEl.scrollTop = listEl.scrollHeight;
+}
 
-    btnCancel?.addEventListener('click', () => { formContainer.style.display = 'none'; });
+function configurarInputChatResena() {
+    const input = document.getElementById('review-chat-input');
+    const btn = document.getElementById('btn-send-review');
+    if (!input || !btn) return;
 
-    ratingSelect?.addEventListener('click', (e) => {
-        const span = e.target.closest('span[data-rating]');
-        if (span) {
-            ratingSeleccionado = parseInt(span.dataset.rating);
-            actualizarEstrellasInput(ratingSeleccionado);
-        }
-    });
+    if (!input.dataset.wired) {
+        input.dataset.wired = '1';
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                void publicarResenaChat();
+            }
+        });
+    }
 
-    textarea?.addEventListener('input', () => {
-        charCount.textContent = textarea.value.length;
-    });
+    if (!btn.dataset.wired) {
+        btn.dataset.wired = '1';
+        btn.addEventListener('click', () => {
+            void publicarResenaChat();
+        });
+    }
+}
 
-    form?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (ratingSeleccionado < 1) {
-            mostrarNotificacion('Seleccioná una calificación', 'error');
+async function publicarResenaChat() {
+    const input = document.getElementById('review-chat-input');
+    const texto = input?.value?.trim() || '';
+    if (!texto) return;
+
+    const userName = obtenerNombreUsuarioDisponible();
+    if (!userName) {
+        mostrarNotificacion('Necesitás iniciar sesión o indicar un nombre para publicar.', 'error');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/reviews/product/${productoActual._id}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ comment: texto, userName })
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+            mostrarNotificacion(json.message || 'No se pudo publicar la reseña', 'error');
             return;
         }
-        const userName = document.getElementById('review-user-name').value.trim();
-        const userEmail = document.getElementById('review-user-email').value.trim();
-        const comment = document.getElementById('review-comment').value.trim();
 
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/reviews/product/${productoActual._id}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userName, userEmail, rating: ratingSeleccionado, comment })
-            });
-            const json = await res.json();
-            if (json.success) {
-                mostrarNotificacion('¡Reseña publicada!', 'success');
-                formContainer.style.display = 'none';
-                form.reset();
-                cargarResenas();
-            } else {
-                mostrarNotificacion(json.message || 'Error al publicar', 'error');
-            }
-        } catch (err) {
-            mostrarNotificacion('Error de conexión', 'error');
-        }
+        input.value = '';
+        await cargarResenas();
+    } catch (err) {
+        mostrarNotificacion('Error de conexión', 'error');
+    }
+}
+
+function configurarSelectorRating() {
+    const ratingSelect = document.getElementById('rating-select');
+    if (!ratingSelect || ratingSelect.dataset.wired) return;
+
+    ratingSelect.dataset.wired = '1';
+    ratingSelect.addEventListener('click', (event) => {
+        const btn = event.target.closest('button[data-rating]');
+        if (!btn) return;
+        const rating = Number(btn.dataset.rating || 0);
+        if (!rating) return;
+        void guardarRatingUsuario(rating);
     });
+}
+
+async function guardarRatingUsuario(rating) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/reviews/product/${productoActual._id}/rating`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rating })
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+            mostrarNotificacion(json.message || 'No se pudo guardar tu calificación', 'error');
+            return;
+        }
+
+        ratingSeleccionado = rating;
+        actualizarEstrellasInput(ratingSeleccionado);
+        if (json.stats) {
+            renderizarResumenRating(json.stats);
+        }
+        mostrarNotificacion('Calificación guardada', 'success');
+    } catch (err) {
+        mostrarNotificacion('Error de conexión', 'error');
+    }
 }
 
 function actualizarEstrellasInput(rating) {
-    const spans = document.querySelectorAll('#rating-select span');
-    spans.forEach((s, i) => {
-        const r = parseInt(s.dataset.rating);
-        s.classList.toggle('active', r <= rating);
-        s.querySelector('i').className = r <= rating ? 'fas fa-star' : 'far fa-star';
+    const buttons = document.querySelectorAll('#rating-select button[data-rating]');
+    buttons.forEach((btn) => {
+        const current = Number(btn.dataset.rating || 0);
+        const active = current <= rating;
+        btn.classList.toggle('active', active);
+        btn.querySelector('i').className = active ? 'fas fa-star' : 'far fa-star';
+    });
+}
+
+function iniciarPollingResenas() {
+    if (pollingResenasId) {
+        clearInterval(pollingResenasId);
+    }
+    pollingResenasId = setInterval(() => {
+        void cargarResenas();
+    }, REVIEW_REFRESH_MS);
+}
+
+function obtenerNombreUsuarioDisponible() {
+    try {
+        const localUser = JSON.parse(localStorage.getItem('usuario') || 'null');
+        const nombreSesion = typeof localUser?.name === 'string' ? localUser.name.trim() : '';
+        if (nombreSesion) return nombreSesion;
+    } catch (error) {
+        console.warn('No se pudo leer el usuario de sesión local.', error);
+    }
+
+    const nombreGuardado = (localStorage.getItem(GUEST_REVIEW_NAME_KEY) || '').trim();
+    if (nombreGuardado) return nombreGuardado;
+
+    const nombreIngresado = (window.prompt('Ingresá tu nombre para publicar la reseña:') || '').trim();
+    if (!nombreIngresado) return '';
+    localStorage.setItem(GUEST_REVIEW_NAME_KEY, nombreIngresado);
+    return nombreIngresado;
+}
+
+function actualizarHintRating() {
+    const hint = document.getElementById('rating-login-hint');
+    if (!hint) return;
+    const hayUsuario = !!obtenerUsuarioLocal();
+    hint.textContent = hayUsuario
+        ? (ratingSeleccionado ? `Tu calificación actual: ${ratingSeleccionado} estrella${ratingSeleccionado > 1 ? 's' : ''}` : 'Podés calificar este producto de 1 a 5 estrellas.')
+        : 'Iniciá sesión para guardar tu calificación.';
+}
+
+function obtenerUsuarioLocal() {
+    try {
+        return JSON.parse(localStorage.getItem('usuario') || 'null');
+    } catch {
+        return null;
+    }
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+}
+
+function formatearFechaHora(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleString('es-AR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
     });
 }
 

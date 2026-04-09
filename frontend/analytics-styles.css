@@ -46,6 +46,52 @@
     opacity: 0.8;
 }
 
+/* Navegación por año en gráfico de ventas */
+.chart-year-navigation {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.current-year-display {
+    font-size: 1.1rem;
+    font-weight: 600;
+    min-width: 60px;
+    text-align: center;
+    color: white;
+}
+
+.year-nav-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.year-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+.year-nav-btn:active {
+    transform: scale(0.95);
+}
+
+.year-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
 /* Contenido de las tarjetas */
 .analytics-card-content {
     padding: 2rem;
