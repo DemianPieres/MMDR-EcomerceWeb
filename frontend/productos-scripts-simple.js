@@ -1,6 +1,16 @@
 // ===== SISTEMA SIMPLIFICADO DE PRODUCTOS =====
 
-const API_BASE_URL = 'http://localhost:4000';
+function resolveApiBaseUrl() {
+    if (typeof window === 'undefined') return 'http://localhost:4000';
+    if (window.MMDR_API_BASE) return window.MMDR_API_BASE;
+    const h = window.location.hostname;
+    return h ? `http://${h}:4000` : 'http://localhost:4000';
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
+if (typeof window !== 'undefined') {
+    window.MMDR_API_BASE = API_BASE_URL;
+}
 
 // Variable global para almacenar todos los productos
 let todosLosProductos = [];
