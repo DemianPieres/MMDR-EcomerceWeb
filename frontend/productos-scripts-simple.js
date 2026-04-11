@@ -23,17 +23,26 @@ async function cargarProductos() {
     try {
         console.log('📡 Conectando a:', `${API_BASE_URL}/api/products`);
         
-        const respuesta = await fetch(`${API_BASE_URL}/api/products?limit=100`);
-        
+        const respuesta = await fetch(`${API_BASE_URL}/api/products?limit=100`, {
+            method: 'GET',
+            headers: { Accept: 'application/json' }
+        });
+
         console.log('📊 Estado de respuesta:', respuesta.status, respuesta.statusText);
-        
+
+        const data = await respuesta.json().catch(() => ({}));
+
         if (!respuesta.ok) {
-            throw new Error(`Error del servidor: ${respuesta.status} - ${respuesta.statusText}`);
+            const msg = data.message || data.error || respuesta.statusText || 'Error desconocido';
+            throw new Error(`${respuesta.status}: ${msg}`);
         }
-        
-        const data = await respuesta.json();
+
+        if (data.success === false) {
+            throw new Error(data.message || data.error || 'La API devolvió un error');
+        }
+
         console.log('✅ Datos recibidos:', data);
-        
+
         const productos = data.data || data.products || [];
         console.log(`📦 Total de productos: ${productos.length}`);
         

@@ -39,13 +39,17 @@ async function cargarProducto() {
     }
 
     try {
-        const res = await fetch(`${API_BASE_URL}/api/products/${id}`);
-        if (!res.ok) {
+        const res = await fetch(`${API_BASE_URL}/api/products/${encodeURIComponent(id)}`, {
+            headers: { Accept: 'application/json' }
+        });
+        const json = await res.json().catch(() => ({}));
+
+        if (!res.ok || json.success === false) {
+            console.error('Detalle producto:', res.status, json);
             mostrarError();
             return;
         }
 
-        const json = await res.json();
         productoActual = json.data || json;
         renderizarProducto();
         inicializarResenas();
