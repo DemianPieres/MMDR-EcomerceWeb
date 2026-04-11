@@ -193,6 +193,16 @@ header {
     height: 100px;
 }
 
+.logo-img {
+    max-width: min(100%, 320px);
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 16px;
+    object-fit: contain;
+}
+
 .brand-text {
     font-size: 48px;
     font-weight: bold;
