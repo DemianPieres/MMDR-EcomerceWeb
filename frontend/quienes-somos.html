@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MMDR — Quiénes Somos</title>
+  <link rel="stylesheet" href="quienes-somos.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Barlow:ital,wght@0,300;0,400;0,500;1,300&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet" />
+  <!-- Three.js for 3D Globe -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-logo">
+      <span class="logo-dot"></span>
+      <span class="logo-text">MMDR</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="inicio.html" class="nav-link active">INICIO</a></li>
+      <li><a href="#about" class="nav-link">NOSOTROS</a></li>
+      <li><a href="productos.html" class="nav-link">PRODUCTOS</a></li>
+      <li><a href="#gallery" class="nav-link">GALERÍA</a></li>
+      <li><a href="#reviews" class="nav-link">RESEÑAS</a></li>
+      <li><a href="contacto.html" class="nav-link">CONTACTO</a></li>
+    </ul>
+    <button class="nav-search" aria-label="Buscar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+    </button>
+    <button class="hamburger" id="hamburger" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ========== HERO SECTION ========== -->
+  <section class="hero" id="hero">
+    <!-- Slideshow backgrounds -->
+    <div class="hero-slides">
+      <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80')"></div>
+      <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=80')"></div>
+      <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=80')"></div>
+      <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1600&q=80')"></div>
+      <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600&q=80')"></div>
+    </div>
+    <div class="hero-overlay"></div>
+
+    <!-- Side slide indicators -->
+    <div class="hero-indicators">
+      <span class="indicator active" data-slide="0">01</span>
+      <span class="indicator" data-slide="1">02</span>
+      <span class="indicator current active-line" data-slide="2">03</span>
+      <span class="indicator" data-slide="3">04</span>
+      <span class="indicator" data-slide="4">05</span>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <span class="hero-title-line reveal-up">¿QUIÉNES</span>
+        <span class="hero-title-line reveal-up delay-1">SOMOS?</span>
+      </h1>
+      <p class="hero-subtitle reveal-up delay-2">
+        Somos una empresa que se dedica a la venta de<br />
+        productos y servicios en el rubro automotriz y motos.<br />
+        Trabajando con pasión y compromiso para ofrecer<br />
+        la mejor calidad y servicio a nuestros clientes en el pais.
+      </p>
+    </div>
+
+    <!-- Bottom info bars -->
+    <div class="hero-infobars">
+      <div class="infobar reveal-fade delay-3">
+        <div class="infobar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e63030" stroke-width="2" width="20" height="20">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="infobar-text">
+          <strong>Presencia en todo el pais</strong>
+          <p>Operamos en todo el pais con presencia en Chilecito, La Rioja.</p>
+        </div>
+        <a href="#location" class="infobar-link">MÁS DETALLE <span>→</span></a>
+      </div>
+      <div class="infobar reveal-fade delay-4">
+        <div class="infobar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e63030" stroke-width="2" width="20" height="20">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="infobar-text">
+          <strong>Calidad Garantizada</strong>
+          <p>Más de 10 años brindando soluciones de excelencia.</p>
+        </div>
+        <a href="#about" class="infobar-link">MÁS DETALLE <span>→</span></a>
+      </div>
+      <div class="infobar reveal-fade delay-5">
+        <div class="infobar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e63030" stroke-width="2" width="20" height="20">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="infobar-text">
+          <strong>Equipo Profesional</strong>
+          <p>Especialistas comprometidos con nuestros clientes.</p>
+        </div>
+        <a href="#services" class="infobar-link">MÁS DETALLE <span>→</span></a>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="hero-scroll">
+      <span class="scroll-line"></span>
+      <span class="scroll-label">SCROLL</span>
+    </div>
+  </section>
+
+  <!-- ========== ABOUT / QUIÉNES SOMOS ========== -->
+  <section class="about" id="about">
+    <div class="about-inner">
+      <div class="about-left reveal-left">
+        <span class="section-tag">— QUIÉNES SOMOS</span>
+        <h2 class="section-title">Una empresa con<br /><em>visión y propósito</em></h2>
+        <p class="about-text">
+          En <strong>MMDR</strong> nos especializamos La empresa MMDR se especializa en la comercialización de productos para el sector automotriz y motociclista. 
+          Su catálogo incluye una amplia variedad de autopartes y motopartes, así como accesorios y lubricantes, ofreciendo soluciones integrales para el 
+          mantenimiento y cuidado de vehículos en ambos segmentos. Dentro del área de accesorios, se destaca una unidad productiva interna que opera como 
+          subempresa, encargada de la fabricación de cubreasientos para automóviles. Esta división no solo abastece el catálogo general de MMDR, sino que 
+          también ha logrado un posicionamiento propio gracias a su volumen de producción y a una alta tasa de ventas a lo largo del territorio argentino. 
+          Su desarrollo productivo ha sido clave para fortalecer la identidad de marca y generar valor agregado a partir de un producto exclusivo de fabricación propia.
+        </p>
+        <p class="about-text">
+          Nuestro equipo multidisciplinario trabaja con pasión y dedicación para ofrecer 
+          soluciones innovadoras que se adaptan a las necesidades de cada cliente, 
+          superando expectativas en cada entrega.
+        </p>
+        <div class="about-stats">
+          <div class="stat">
+            <span class="stat-number" data-target="10">0</span><span class="stat-plus">+</span>
+            <span class="stat-label">Años de experiencia</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number" data-target="250">0</span><span class="stat-plus">+</span>
+            <span class="stat-label">Marcas trabajan con nosotros</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number" data-target="98">0</span><span class="stat-plus">%</span>
+            <span class="stat-label">Clientes satisfechos</span>
+          </div>
+        </div>
+        <a href="#services" class="btn-primary">VER SERVICIOS →</a>
+      </div>
+      <div class="about-right reveal-right">
+        <div class="about-img-wrap">
+          <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80" alt="Nuestro equipo" class="about-img" />
+          <div class="about-img-accent"></div>
+          <div class="about-badge">
+            <span class="badge-number">10</span>
+            <span class="badge-text">AÑOS<br/>DE ÉXITO</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== POPULAR SERVICES / TOURS SECTION ========== -->
+  <section class="services" id="services">
+    <div class="services-header reveal-up">
+      <span class="section-tag center">— NUESTROS PRODUCTOS</span>
+      <h2 class="section-title center">Productos mas Vendidos</h2>
+      <p class="section-sub">Este es un listado de los productos mas vendidos por nuestra empresa a lo largo de los años.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal-fade" data-delay="0">
+        <div class="card-img-wrap">
+          <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80" alt="Consultoría" />
+          <div class="card-overlay"></div>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">CONSULTORÍA</h3>
+          <p class="card-desc">Asesoramiento estratégico para optimizar tus procesos y resultados.</p>
+        </div>
+        <a href="#" class="card-link">Explorar →</a>
+      </div>
+      <div class="service-card reveal-fade featured" data-delay="100">
+        <div class="card-img-wrap">
+          <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80" alt="Desarrollo" />
+          <div class="card-overlay"></div>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">DESARROLLO</h3>
+          <p class="card-desc">Soluciones tecnológicas a medida para cada necesidad empresarial.</p>
+        </div>
+        <a href="#" class="card-link">Explorar →</a>
+      </div>
+      <div class="service-card reveal-fade" data-delay="200">
+        <div class="card-img-wrap">
+          <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=80" alt="Marketing" />
+          <div class="card-overlay"></div>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">MARKETING</h3>
+          <p class="card-desc">Estrategias digitales para posicionar tu marca en el mercado.</p>
+        </div>
+        <a href="#" class="card-link">Explorar →</a>
+      </div>
+      <div class="service-card reveal-fade" data-delay="300">
+        <div class="card-img-wrap">
+          <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80" alt="Gestión" />
+          <div class="card-overlay"></div>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">GESTIÓN</h3>
+          <p class="card-desc">Administración eficiente de proyectos y recursos empresariales.</p>
+        </div>
+        <a href="#" class="card-link">Explorar →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== DISCOVER / CTA SECTION ========== -->
+  <section class="discover" id="gallery">
+    <div class="discover-bg" style="background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=80')"></div>
+    <div class="discover-overlay"></div>
+    <div class="discover-content">
+      <div class="discover-left reveal-left">
+        <h2 class="discover-title">DESCUBRÍ COMO<br />ES EL HAMBIENTE<br />DE NUESTRA EMPRESA</h2>
+        <a href="#" class="video-btn">
+          <span class="video-btn-icon">
+            <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+              <polygon points="5,3 19,12 5,21"/>
+            </svg>
+          </span>
+          VER EMPRESA
+        </a>
+        <blockquote class="discover-quote">
+          <p>"El compromiso con las personas y la excelencia en el servicio 
+          son la base de todo lo que construimos. Cada venta refleja 
+          nuestra filosofía de trabajo."</p>
+          <cite>© Fundador, MMDR</cite>
+        </blockquote>
+      </div>
+      <div class="discover-right reveal-right">
+        <div class="video-thumb">
+          <img src="https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=400&q=80" alt="Video 1" />
+          <div class="video-thumb-overlay">
+            <span class="play-icon">
+              <svg viewBox="0 0 24 24" fill="white" width="24" height="24"><polygon points="5,3 19,12 5,21"/></svg>
+            </span>
+          </div>
+        </div>
+        <div class="video-thumb">
+          <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=400&q=80" alt="Video 2" />
+          <div class="video-thumb-overlay">
+            <span class="play-icon">
+              <svg viewBox="0 0 24 24" fill="white" width="24" height="24"><polygon points="5,3 19,12 5,21"/></svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== LOCATION SECTION WITH 3D GLOBE ========== -->
+  <section class="location" id="location">
+    <div class="location-inner">
+      <!-- LEFT: Info -->
+      <div class="location-info reveal-left">
+        <span class="section-tag">— NUESTRA UBICACIÓN</span>
+        <h2 class="section-title">Chilecito,<br /><em>La Rioja</em></h2>
+
+        <!-- Region tabs (like AWS) -->
+        <div class="region-tabs">
+          <button class="region-tab active" data-region="argentina">Argentina</button>
+          <button class="region-tab" data-region="regional">Regional</button>
+          <button class="region-tab" data-region="nacional">Nacional</button>
+        </div>
+
+        <div class="region-panel active" data-panel="argentina">
+          <div class="region-card">
+            <p class="region-label">Regiones de cobertura</p>
+            <h3 class="region-name">América del Sur — Argentina</h3>
+            <div class="region-list">
+              <div class="region-item available">
+                <span class="dot"></span>Chilecito, La Rioja (Sede Principal)
+              </div>
+              <div class="region-item available">
+                <span class="dot"></span>La Rioja Capital
+              </div>
+              <div class="region-item available">
+                <span class="dot"></span>Famatina, La Rioja
+              </div>
+              <div class="region-item available">
+                <span class="dot"></span>Vinchina, La Rioja
+              </div>
+              <div class="region-item coming">
+                <span class="dot coming"></span>Catamarca (Próximamente)
+              </div>
+              <div class="region-item coming">
+                <span class="dot coming"></span>San Juan (Próximamente)
+              </div>
+            </div>
+            <div class="region-legend">
+              <span><span class="dot-legend available"></span> Disponible</span>
+              <span><span class="dot-legend coming"></span> Próximamente</span>
+            </div>
+          </div>
+          <div class="location-edges">
+            <p class="edges-label">Puntos de venta</p>
+            <span class="edges-count">12 <button class="toggle-btn">+</button></span>
+          </div>
+        </div>
+
+        <div class="region-panel" data-panel="regional">
+          <div class="region-card">
+            <p class="region-label">Cobertura regional</p>
+            <h3 class="region-name">Noroeste Argentino</h3>
+            <div class="region-list">
+              <div class="region-item available"><span class="dot"></span>La Rioja</div>
+              <div class="region-item available"><span class="dot"></span>Catamarca</div>
+              <div class="region-item coming"><span class="dot coming"></span>Tucumán (Próximamente)</div>
+              <div class="region-item coming"><span class="dot coming"></span>Salta (Próximamente)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="region-panel" data-panel="nacional">
+          <div class="region-card">
+            <p class="region-label">Cobertura nacional</p>
+            <h3 class="region-name">Argentina</h3>
+            <div class="region-list">
+              <div class="region-item available"><span class="dot"></span>Buenos Aires (online)</div>
+              <div class="region-item available"><span class="dot"></span>Córdoba (online)</div>
+              <div class="region-item coming"><span class="dot coming"></span>Rosario (Próximamente)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-info reveal-fade">
+          <div class="contact-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#e63030" stroke-width="2" width="18" height="18">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>Av. Joaquín V. González 123, Chilecito, La Rioja</span>
+          </div>
+          <div class="contact-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#e63030" stroke-width="2" width="18" height="18">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.59a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16z"/>
+            </svg>
+            <span>+54 9 3825 000000</span>
+          </div>
+          <div class="contact-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#e63030" stroke-width="2" width="18" height="18">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+            </svg>
+            <span>contacto@nexum.com.ar</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: 3D Globe -->
+      <div class="location-globe reveal-right">
+        <div class="globe-wrapper">
+          <canvas id="globeCanvas"></canvas>
+          <div class="globe-label">
+            <span class="globe-pin">📍</span>
+            <span>Chilecito, La Rioja</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== REVIEWS ========== -->
+  <section class="reviews" id="reviews">
+    <div class="reviews-header reveal-up">
+      <span class="section-tag center">— TESTIMONIOS</span>
+      <h2 class="section-title center">LO QUE DICEN<br/>NUESTROS CLIENTES</h2>
+    </div>
+    <div class="reviews-track-wrap">
+      <div class="reviews-track" id="reviewsTrack">
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"NEXUM transformó por completo nuestra operación. Profesionalismo y resultados desde el primer día."</p>
+          <div class="review-author">
+            <img src="https://i.pravatar.cc/48?img=1" alt="Cliente 1" />
+            <div>
+              <strong>Martín Rodríguez</strong>
+              <span>CEO, TechLa Rioja</span>
+            </div>
+          </div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"Increíble equipo de trabajo. Superaron todas nuestras expectativas con una propuesta innovadora y eficiente."</p>
+          <div class="review-author">
+            <img src="https://i.pravatar.cc/48?img=5" alt="Cliente 2" />
+            <div>
+              <strong>Lucía Fernández</strong>
+              <span>Directora, Agro Chilecito</span>
+            </div>
+          </div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"Confiamos en NEXUM para digitalizar nuestra empresa y el resultado fue excepcional. Los recomendamos ampliamente."</p>
+          <div class="review-author">
+            <img src="https://i.pravatar.cc/48?img=12" alt="Cliente 3" />
+            <div>
+              <strong>Carlos Díaz</strong>
+              <span>Gerente, Construcciones NOA</span>
+            </div>
+          </div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"El nivel de atención y seguimiento que nos brindaron fue inigualable. Sin duda volveríamos a trabajar con ellos."</p>
+          <div class="review-author">
+            <img src="https://i.pravatar.cc/48?img=20" alt="Cliente 4" />
+            <div>
+              <strong>Ana Quiroga</strong>
+              <span>Emprendedora, La Rioja</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="reviews-dots" id="reviewsDots"></div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <span class="logo-dot"></span>
+        <span class="logo-text">MMDR</span>
+        <p class="footer-tagline">Transformando ideas en resultados.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>EMPRESA</h4>
+          <ul>
+            <li><a href="#about">Quiénes Somos</a></li>
+            <li><a href="#services">Servicios</a></li>
+            <li><a href="#gallery">Galería</a></li>
+            <li><a href="#contact">Contacto</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>SERVICIOS</h4>
+          <ul>
+            <li><a href="#">Consultoría</a></li>
+            <li><a href="#">Desarrollo</a></li>
+            <li><a href="#">Marketing</a></li>
+            <li><a href="#">Gestión</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>CONTACTO</h4>
+          <ul>
+            <li><a href="#">Chilecito, La Rioja</a></li>
+            <li><a href="#">+54 9 3825 000000</a></li>
+            <li><a href="#">contacto@nexum.com.ar</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 MMDR. Todos los derechos reservados.</p>npm run dev
+      
+      <div class="social-links">
+        <a href="#" class="social-link" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+        </a>
+        <a href="#" class="social-link" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20">
+            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.5C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/>
+          </svg>
+        </a>
+        <a href="#" class="social-link" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+          </svg>
+        </a>
+        <a href="#" class="social-link" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20">
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="quienes-somos.js"></script>
+</body>
+</html>
