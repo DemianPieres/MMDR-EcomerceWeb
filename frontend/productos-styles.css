@@ -18,8 +18,6 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    position: relative;
-    z-index: 1;
 }
 
 /* Notificaciones */
@@ -59,75 +57,18 @@ body {
         opacity: 1;
     }
 }
-.main-nav {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e0e0e0;
-    padding: 15px 0;
+
+/* Header o barra top para productos.html */
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.8);
 }
 
-.nav-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-}
-
-.logo h1 {
-    font-size: 24px;
-    font-weight: bold;
-    color: #000000;
-}
-
-.nav-links {
-    display: flex;
-    gap: 30px;
-    list-style: none;
-}
-
-.nav-links a {
-    color: #000000;
-    text-decoration: none;
-    font-size: 16px;
-    position: relative;
-}
-
-.nav-links a.active {
-    text-decoration: underline;
-}
-
-.nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.search-bar {
-    position: relative;
-}
-
-.search-bar input {
-    padding: 10px 40px 10px 15px;
-    border: 1px solid #ccc;
-    border-radius: 25px;
-    width: 250px;
-    font-size: 14px;
-}
-
-.search-bar i {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #666;
-}
-
-.nav-actions i {
-    cursor: pointer;
-    font-size: 18px;
-    color: #666;
-}
 .top-bar {
     background-color: #000000;
     color: #ffffff;
@@ -216,11 +157,301 @@ body {
         box-shadow: 0 0 0 20px rgba(255, 255, 255, 0.1), 0 0 0 40px rgba(255, 255, 255, 0.1), 0 0 0 60px rgba(255, 255, 255, 0.1), 0 0 0 80px rgba(255, 255, 255, 0);
     }
 }
+
+/* ========== Main navigation (productos.html) — una fila, flexbox ========== */
+
+.main-nav {
+    background-color: rgba(255, 255, 255, 0.10);
+    border-bottom: 1px solid #e0e0e0;
+    padding: 12px 0;
+    position: relative;
+    z-index: 1000;
+}
+
+.nav-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(12px, 3vw, 24px);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: clamp(12px, 2vw, 24px);
+    width: 100%;
+    min-height: 52px;
+}
+
+/* Logo + botón menú móvil */
+.nav-start {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.nav-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.nav-hamburger:hover {
+    background: #f3f4f6;
+}
+
+.nav-hamburger-line {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #1a1a1a;
+    border-radius: 1px;
+    transition: transform 0.25s ease, opacity 0.2s ease;
+}
+
+.nav-hamburger--open .nav-hamburger-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.nav-hamburger--open .nav-hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-hamburger--open .nav-hamburger-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+.logo h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #3dba3d;
+    line-height: 1.2;
+    margin: 0;
+}
+
+.logo-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.logo-link:hover {
+    opacity: 0.88;
+}
+
+/* Enlaces — al lado del logo (desktop) */
+.nav-links {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: clamp(14px, 2vw, 28px);
+    list-style: none;
+    flex-shrink: 0;
+}
+
+.nav-links a {
+    color: #000000;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: color 0.15s ease;
+}
+
+.nav-links a:hover {
+    color: #374151;
+}
+
+.nav-links a.active {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+/* Buscador centrado en el espacio flexible entre enlaces y acciones */
+.nav-search-center {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+    padding: 0 clamp(4px, 1.5vw, 20px);
+}
+
+.nav-search-center .search-bar {
+    width: 100%;
+    max-width: 380px;
+}
+
+.search-bar {
+    position: relative;
+    width: 100%;
+}
+
+.search-bar input {
+    display: block;
+    width: 100%;
+    padding: 10px 42px 10px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    font-size: 14px;
+    background: #fafafa;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: #9ca3af;
+    background: #ffffff;
+}
+
+.search-bar i {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    pointer-events: none;
+}
+
+/* Derecha: favoritos, carrito; avatar / login al final */
+.nav-end {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(10px, 1.5vw, 18px);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.nav-actions-icons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
+}
+
+.nav-end .nav-actions-icons i {
+    cursor: pointer;
+    font-size: 19px;
+    color: #4b5563;
+    transition: color 0.15s ease;
+}
+
+.nav-end .nav-actions-icons i:hover {
+    color: #111827;
+}
+
+/* Compatibilidad si queda alguna .nav-actions suelta */
+.nav-actions i {
+    cursor: pointer;
+    font-size: 18px;
+    color: #666;
+}
+
+.nav-auth-slot--actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 10px;
+    margin-left: 4px;
+}
+
+.nav-auth-slot--actions .nav-auth-login-link {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Menú móvil + ajustes de barra */
+@media (max-width: 992px) {
+    .nav-hamburger {
+        display: inline-flex;
+    }
+
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 8px 0 16px;
+        margin: 0;
+        background: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+        z-index: 999;
+    }
+
+    .nav-links.nav-links--open {
+        display: flex;
+    }
+
+    .nav-links a {
+        padding: 14px 24px;
+        border-bottom: 1px solid #f3f4f6;
+        white-space: normal;
+    }
+
+    .nav-search-center {
+        justify-content: flex-end;
+        padding-left: 8px;
+        padding-right: 0;
+    }
+
+    .nav-search-center .search-bar {
+        max-width: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .nav-auth-slot--actions .nav-auth-login-link {
+        font-size: 13px;
+    }
+
+    .nav-actions-icons {
+        gap: 14px;
+    }
+
+    .nav-content {
+        gap: 8px;
+    }
+}
+
 /* Main Container */
 .main-container {
     display: flex;
     margin-top: 120px; /* Account for fixed header */
     min-height: calc(100vh - 120px);
+}
+
+/* Sidebar para productos.html */
+.sidebar {
+    width: 100px;
+    background-color: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    padding: 20px 10px;
+    position: fixed;
+    left: 0;
+    top: 120px;
+    height: calc(100vh - 120px);
+    overflow: visible;
+    display: flex;
+    justify-content: center;
+    z-index: 1000;
 }
 
 /* Products Main Section */
@@ -269,7 +500,8 @@ body {
 /* Page Header */
 .page-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom:0rem;
+    margin-top: 3rem;
     padding: 3rem 0;
     position: relative;
 }
@@ -282,7 +514,7 @@ body {
     transform: translateX(-50%);
     width: 100px;
     height: 4px;
-    background: linear-gradient(90deg, transparent, #e74c3c, transparent);
+    background: linear-gradient(90deg, transparent, #0d2e10, transparent);
 }
 
 .page-title {
@@ -292,13 +524,13 @@ body {
     margin-bottom: 1.5rem;
     text-transform: uppercase;
     letter-spacing: 3px;
-    text-shadow: 0 4px 20px rgba(231, 76, 60, 0.5), 0 0 40px rgba(255, 255, 255, 0.1);
+    text-shadow: 0 4px 20px rgba(61, 186, 61, 1), 0 0 40px rgba(255, 255, 255, 0.1);
     animation: titleGlow 2s ease-in-out infinite;
 }
 
 @keyframes titleGlow {
-    0%, 100% { text-shadow: 0 4px 20px rgba(231, 76, 60, 0.5), 0 0 40px rgba(255, 255, 255, 0.1); }
-    50% { text-shadow: 0 4px 30px rgba(231, 76, 60, 0.7), 0 0 60px rgba(255, 255, 255, 0.2); }
+    0%, 100% { text-shadow: 0 4px 20px rgba(61, 186, 61, 1), 0 0 40px rgba(255, 255, 255, 0.1); }
+    50% { text-shadow: 0 4px 30px rgba(61, 186, 61, 1), 0 0 60px rgba(255, 255, 255, 0.2); }
 }
 
 .breadcrumb {
@@ -308,7 +540,7 @@ body {
 }
 
 .breadcrumb a {
-    color: #e74c3c;
+    color: #3dba3d;
     text-decoration: none;
     transition: all 0.3s ease;
     font-weight: 600;
@@ -346,7 +578,7 @@ body {
     position: absolute;
     top: -5px;
     right: -5px;
-    background: #e74c3c;
+    background: #3dba3d;
     color: white;
     border-radius: 50%;
     width: 20px;
@@ -397,8 +629,8 @@ body {
 
 .filter-select:focus {
     outline: none;
-    border-color: #e74c3c;
-    box-shadow: 0 0 20px rgba(231, 76, 60, 0.4);
+    border-color: #3dba3d;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
     background: rgba(255, 255, 255, 0.25);
 }
 
@@ -434,7 +666,7 @@ body {
 
 .view-btn.active {
     background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-    border-color: #e74c3c;
+    border-color: #3dba3d;
     transform: scale(1.05);
     box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
 }
@@ -449,7 +681,7 @@ body {
 
 /* Product Card */
 .product-card {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(177, 212, 171, 0.95);
     border-radius: 20px;
     overflow: hidden;
     transition: all 0.4s ease;
@@ -461,8 +693,8 @@ body {
 
 .product-card:hover {
     transform: translateY(-10px) scale(1.02);
-    border-color: #e74c3c;
-    box-shadow: 0 20px 50px rgba(231, 76, 60, 0.4), 0 0 30px rgba(231, 76, 60, 0.2);
+    border-color: #3dba3d;
+    box-shadow: 0 20px 50px rgba(61, 186, 61, 1), 0 0 30px rgba(231, 76, 60, 0.2);
     background: rgba(255, 255, 255, 1);
 }
 
@@ -518,13 +750,13 @@ body {
 }
 
 .action-btn:hover {
-    background: #e74c3c;
+    background: #3dba3d;
     color: white;
     transform: scale(1.1);
 }
 
 .wishlist-btn.active .heart-icon {
-    color: #e74c3c;
+    color: #3dba3d;
 }
 
 /* Product Badge */
@@ -540,7 +772,7 @@ body {
 }
 
 .product-badge.sale {
-    background: #e74c3c;
+    background: #3dba3d;
     color: white;
 }
 
@@ -612,7 +844,7 @@ body {
 .current-price {
     font-size: 1.6rem;
     font-weight: 800;
-    color: #e74c3c;
+    color: #3dba3d;
     text-shadow: 0 2px 4px rgba(231, 76, 60, 0.2);
     letter-spacing: 0.5px;
 }
@@ -638,7 +870,7 @@ body {
     padding: 1rem 1.5rem;
     border: none;
     border-radius: 12px;
-    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    background: linear-gradient(135deg, #3dba3d 0%, #6dff6d 100%);
     color: white;
     font-size: 1rem;
     font-weight: 700;
@@ -646,7 +878,7 @@ body {
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    box-shadow: 0 4px 15px rgba(120,255,120,0.45);
     position: relative;
     overflow: hidden;
 }
@@ -656,10 +888,10 @@ body {
     width: 50px;
     height: 50px;
     min-width: 50px;
-    border: 2px solid #e74c3c;
+    border: 2px solid #3dba3d;
     border-radius: 12px;
     background: white;
-    color: #e74c3c;
+    color: #3dba3d;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -670,14 +902,14 @@ body {
 }
 
 .favorito-btn-card:hover {
-    background: #e74c3c;
+    background: #3dba3d;
     color: white;
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
 }
 
 .favorito-btn-card.active {
-    background: #e74c3c;
+    background: #3dba3d;
     color: white;
     border-color: #c0392b;
     animation: heartBeat 0.5s ease;
@@ -710,7 +942,7 @@ body {
 }
 
 .add-to-cart-btn:hover {
-    background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+    background: linear-gradient(135deg, #3dba3d 0%, #0d2e10 100%);
     transform: translateY(-3px);
     box-shadow: 0 12px 25px rgba(231, 76, 60, 0.5);
 }

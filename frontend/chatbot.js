@@ -702,12 +702,12 @@
 
         const gateSignup = document.getElementById('chatbot-gate-signup');
         if (gateSignup) gateSignup.onclick = () => {
-            window.location.href = 'signup.html';
+            window.location.href = 'Register.html';
         };
 
         const gateLogin = document.getElementById('chatbot-gate-login');
         if (gateLogin) gateLogin.onclick = () => {
-            window.location.href = 'Index.html';
+            window.location.href = 'Login.html';
         };
 
         const sendLive = document.getElementById('chatbot-user-send-btn');

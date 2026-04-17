@@ -18,9 +18,9 @@
 
     function loginPageHref() {
         try {
-            return new URL('Index.html', window.location.href).href;
+            return new URL('Login.html', window.location.href).href;
         } catch {
-            return 'Index.html';
+            return 'Login.html';
         }
     }
 

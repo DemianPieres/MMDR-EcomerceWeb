@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MMDR — Iniciar Sesion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="Login.css" />
+</head>
+<body>
+
+<div class="auth-wrapper">
+
+  <!-- ── Left: decorative panel ─────────────────────────────────────── -->
+  <div class="panel-left">
+    <canvas id="lava-canvas"></canvas>
+    <div class="panel-brand">
+      <img class="brand-logo" src="Imagenes/logo.svg" alt="MMDR logo" />
+      <span class="brand-name">MMDR</span>
+      <span class="brand-tagline">eCOMERCE - Web</span>
+    </div>
+  </div>
+
+  <!-- ── Right: login form ──────────────────────────────────────────── -->
+  <div class="panel-right">
+    <div class="form-card">
+
+      <h1 class="form-title">Bienvenido</h1>
+      <p class="form-subtitle">Ingresa tus credenciales en los siguientes campos</p>
+
+      <form id="login-form" novalidate>
+
+        <!-- Email -->
+        <div class="input-group">
+          <label class="input-label" for="email">
+            Email<span class="required-star">*</span>
+          </label>
+          <div class="input-wrap">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="e.g. you@example.com"
+              autocomplete="email"
+            />
+          </div>
+          <span class="field-error" role="alert"></span>
+        </div>
+
+        <!-- Password -->
+        <div class="input-group">
+          <label class="input-label" for="password">
+            Contraseña <span class="required-star">*</span>
+          </label>
+          <div class="input-wrap has-toggle">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+            />
+            <button
+              type="button"
+              class="toggle-password"
+              data-target="password"
+              aria-label="Toggle password visibility"
+            >
+              <!-- Eye open -->
+              <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" fill="none"
+                   viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7
+                         -1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7Z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <!-- Eye off -->
+              <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" fill="none"
+                   viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 3l18 18M10.477 10.477A3 3 0 0013.5 13.5M6.228 6.228
+                         A10.45 10.45 0 002.458 12C3.732 16.057 7.523 19 12 19
+                         c1.98 0 3.818-.574 5.368-1.567M9.88 9.88a3 3 0 104.24 4.24
+                         M17.772 17.772A10.45 10.45 0 0021.542 12
+                         C20.268 7.943 16.477 5 12 5c-.918 0-1.81.126-2.66.36"/>
+              </svg>
+            </button>
+          </div>
+          <span class="field-error" role="alert"></span>
+        </div>
+
+        <!-- Forgot password -->
+        <div class="forgot-row">
+          <a href="#" class="forgot-link">Olvidaste tu Contraseña?</a>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-primary">Iniciar Sesion</button>
+
+      </form>
+
+      <p class="form-footer">
+        No Tenes Una Cuenta?&nbsp;<a href="Register.html">Crear Cuenta</a>
+      </p>
+
+    </div>
+  </div>
+
+</div>
+
+<script src="ScriptsLoginRegister.js"></script>
+</body>
+</html>

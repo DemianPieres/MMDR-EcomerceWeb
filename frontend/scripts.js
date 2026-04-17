@@ -14,31 +14,6 @@ if (typeof window !== "undefined") {
     window.MMDR_API_BASE = API_BASE_URL;
 }
 
-/** Si ya hay sesión en el servidor, no mostrar el formulario de login. */
-async function redirectIfAlreadyLoggedIn() {
-    const loginForm = document.querySelector("#login-form");
-    if (!loginForm) return;
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/me`, { credentials: "include" });
-        if (!response.ok) return;
-        const user = await response.json();
-        const userPayload = {
-            id: user._id,
-            email: user.email,
-            name: user.name,
-            role: user.role === "admin" ? "admin" : "user"
-        };
-        localStorage.setItem("usuario", JSON.stringify(userPayload));
-        if (userPayload.role === "admin") {
-            window.location.replace("mode-selection.html");
-        } else {
-            window.location.replace("inicio.html");
-        }
-    } catch {
-        /* sin servidor: dejar ver login */
-    }
-}
-
 // ==========================
 // Utilidades
 // ==========================
@@ -51,128 +26,6 @@ function showNotification(message, type = "info") {
     setTimeout(() => {
         notification.remove();
     }, 3000);
-}
-
-// ==========================
-// LOGIN
-// ==========================
-async function handleLogin() {
-    const emailInput = document.querySelector("#login-email");
-    const passwordInput = document.querySelector("#login-password");
-    const submitBtn = document.querySelector("#login-submit");
-
-    if (!emailInput.value || !passwordInput.value) {
-        showNotification("Por favor, complete todos los campos", "error");
-        return;
-    }
-
-    submitBtn.textContent = "Iniciando...";
-    submitBtn.disabled = true;
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-                email: emailInput.value.toLowerCase().trim(),
-                password: passwordInput.value
-            })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            showNotification("¡Inicio de sesión exitoso!", "success");
-            const du = data.user || {};
-            const uid = du.id != null ? String(du.id) : du._id != null ? String(du._id) : "";
-            const userPayload = {
-                id: uid,
-                email: du.email,
-                name: du.name,
-                role: du.role === "admin" ? "admin" : "user"
-            };
-            localStorage.setItem("usuario", JSON.stringify(userPayload));
-
-            setTimeout(() => {
-                if (userPayload.role === "admin") {
-                    window.location.href = "mode-selection.html";
-                } else {
-                    window.location.href = "inicio.html";
-                }
-            }, 1500);
-        } else {
-            showNotification(data.error || "Error en el inicio de sesión", "error");
-        }
-    } catch (error) {
-        console.error("Error en login:", error);
-        showNotification("Error de conexión con el servidor. Verifica que el backend esté ejecutándose.", "error");
-    } finally {
-        submitBtn.textContent = "Iniciar Sesión";
-        submitBtn.disabled = false;
-    }
-}
-
-// ==========================
-// REGISTRO
-// ==========================
-async function handleSignup() {
-    const nameInput = document.querySelector("#signup-name");
-    const emailInput = document.querySelector("#signup-email");
-    const passwordInput = document.querySelector("#signup-password");
-    const submitBtn = document.querySelector("#signup-submit");
-
-    if (!nameInput.value || !emailInput.value || !passwordInput.value) {
-        showNotification("Por favor, complete todos los campos", "error");
-        return;
-    }
-
-    if (passwordInput.value.length < 6) {
-        showNotification("La contraseña debe tener al menos 6 caracteres", "error");
-        return;
-    }
-
-    submitBtn.textContent = "Registrando...";
-    submitBtn.disabled = true;
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-                name: nameInput.value.trim(),
-                email: emailInput.value.toLowerCase().trim(),
-                password: passwordInput.value
-            })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            showNotification("¡Cuenta creada exitosamente!", "success");
-            const raw = data.user || data;
-            const userPayload = {
-                id: raw.id || raw._id,
-                email: raw.email,
-                name: raw.name,
-                role: raw.role === "admin" ? "admin" : "user"
-            };
-            localStorage.setItem("usuario", JSON.stringify(userPayload));
-
-            setTimeout(() => {
-                window.location.href = "inicio.html";
-            }, 1500);
-        } else {
-            showNotification(data.error || "Error al registrar usuario", "error");
-        }
-    } catch (error) {
-        console.error("Error en registro:", error);
-        showNotification("Error de conexión con el servidor. Verifica que el backend esté ejecutándose.", "error");
-    } finally {
-        submitBtn.textContent = "Crear Cuenta";
-        submitBtn.disabled = false;
-    }
 }
 
 // ==========================
@@ -189,7 +42,7 @@ function selectMode(mode) {
     if (usuario.role !== "admin") {
         showNotification("No tenés permiso para acceder a esta pantalla.", "error");
         setTimeout(() => {
-            window.location.href = "Index.html";
+            window.location.href = "Login.html";
         }, 1200);
         return;
     }
@@ -490,7 +343,7 @@ function initCreateAccountLink() {
         setTimeout(() => {
             this.style.transform = "scale(1.05)";
         }, 100);
-        window.location.href = "signup.html";
+        window.location.href = "Register.html";
     });
 
     createAccountLink.addEventListener("mouseenter", function () {
@@ -566,24 +419,7 @@ function addRippleStyles() {
 // Inicialización
 // ==========================
 document.addEventListener("DOMContentLoaded", async () => {
-    await redirectIfAlreadyLoggedIn();
     await checkBackendStatus();
-
-    const loginForm = document.querySelector("#login-form");
-    if (loginForm) {
-        loginForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            handleLogin();
-        });
-    }
-
-    const signupForm = document.querySelector("#signup-form");
-    if (signupForm) {
-        signupForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            handleSignup();
-        });
-    }
 
     initHeroCarousel();
     initSearch();

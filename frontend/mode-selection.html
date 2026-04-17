@@ -1,133 +1,58 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selección de Modo - MMDR</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/ogl@0.0.100/dist/ogl.umd.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Selección de Modo - MMDR</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Bai+Jamjuree:wght@400;500;600;700&family=Inter:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="mode-selection-styles.css" />
 </head>
 <body>
-    <!-- Header Section -->
-    <header>
-        <!-- Top Banner -->
-        <div class="top-banner">
-            <div class="container">
-                <div class="banner-content">
-                    <span class="promo-text">Iniciando Sesion Podes Acceder a Promociones Unicas!! - OFF 50%!</span>
-                    <a href="signup.html" class="create-account-link">Crear Cuenta</a>
-                </div>
-                <div class="language-selector">
-                    <span>Español</span>
-                    <span class="arrow">▼</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Main Navigation -->
-        <nav class="main-nav">
-            <div class="container">
-                <div class="nav-brand">
-                    <h1>Login</h1>
-                </div>
-                <ul class="nav-links">
-                    <li><a href="inicio.html">Inicio</a></li>
-                    <li><a href="productos.html">Productos</a></li>
-                    <li><a href="contacto.html">Contacto</a></li>
-                    <li><a href="quienes-somos.html">Quienes Somos</a></li>
-                    <li><a href="Index.html" class="active">Login</a></li>
-                </ul>
-                <div class="search-bar">
-                    <input type="text" placeholder="Que estas buscando?" class="search-input">
-                    <span class="search-icon">🔍</span>
-                </div>
-            </div>
-        </nav>
-    </header>
 
-    <!-- Main Content -->
-    <main class="main-content mode-selection-content">
-        <div class="container">
-            <div class="mode-selection-wrapper">
-                <!-- Mode Selection Question -->
-                <div class="mode-question">
-                    <h2>¿En Que Modo Desea Iniciar Sesion?</h2>
-                </div>
-                
-                <!-- Mode Selection Buttons -->
-                <div class="mode-buttons">
-                    <button class="mode-btn admin-btn" onclick="selectMode('admin')">
-                        Administrador
-                    </button>
-                    <button class="mode-btn user-btn" onclick="selectMode('user')">
-                        Usuario
-                    </button>
-                </div>
-            </div>
-        </div>
-    </main>
+  <div class="bg-layer" aria-hidden="true"></div>
+  <div class="bg-blob-1" aria-hidden="true"></div>
+  <div class="bg-blob-2" aria-hidden="true"></div>
+  <div class="bg-blob-3" aria-hidden="true"></div>
+  <div class="bg-blob-4" aria-hidden="true"></div>
+  <div class="bg-overlay" aria-hidden="true"></div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <!-- Column 1: Exclusivo -->
-                <div class="footer-column">
-                    <h3>Exclusivo</h3>
-                    <h4>Suscribite</h4>
-                    <p>Obtene 10% off en tu proxima compra</p>
-                    <div class="email-subscription">
-                        <input type="email" placeholder="Ingrese su Email" class="email-input">
-                        <button class="send-btn">✈</button>
-                    </div>
-                </div>
+  <main class="container">
 
-                <!-- Column 2: Support -->
-                <div class="footer-column">
-                    <h3>Support</h3>
-                    <p>111 Bijoy sarani, Dhaka, DH 1515, Bangladesh.</p>
-                    <p>mmdrsupport@gmail.com</p>
-                    <p>+54-3825-419431</p>
-                </div>
+    <h1 class="main-title">
+      Bienvenido de Nuevo<br>Administrador
+    </h1>
 
-                <!-- Column 3: Cuenta -->
-                <div class="footer-column">
-                    <h3>Cuenta</h3>
-                    <ul>
-                        <li><a href="#">Mi Cuenta</a></li>
-                        <li><a href="#">Login / Register</a></li>
-                        <li><a href="#">Cart</a></li>
-                        <li><a href="#">Wishlist</a></li>
-                        <li><a href="#">Shop</a></li>
-                    </ul>
-                </div>
+    <p class="subtitle">¿En que modo desea visualizar la web?</p>
 
-                <!-- Column 4: App Download -->
-                <div class="footer-column">
-                    <h3>Descarga Nuestra App para tu celular!</h3>
-                    <div class="qr-code">
-                        <div class="qr-placeholder">QR Code</div>
-                    </div>
-                    <div class="app-badges">
-                        <div class="app-badge google-play">GET IT ON Google Play</div>
-                        <div class="app-badge app-store">Download on the App Store</div>
-                    </div>
-                    <div class="social-icons">
-                        <span class="social-icon">📘</span>
-                        <span class="social-icon">🐦</span>
-                        <span class="social-icon">📷</span>
-                        <span class="social-icon">💼</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>© Copyright Innova+ 2025. All right reserved</p>
-            </div>
-        </div>
-    </footer>
+    <div class="btn-row">
+      <button id="btn-admin" class="btn-mode" type="button">
+        Modo Administrador
+        <span class="arrow">→</span>
+      </button>
 
-    <script src="scripts.js"></script>
+      <button id="btn-usuario" class="btn-mode" type="button">
+        Modo Usuario
+        <span class="arrow">→</span>
+      </button>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <img
+      src="Imagenes/logofootermodeselection.png"
+      alt="Logo Innova+"
+      class="footer-logo"
+    />
+    <span class="footer-copy">© Diseñado por Innova+</span>
+  </footer>
+
+  <script src="scripts.js"></script>
+  <script src="mode-selection-page.js"></script>
+
 </body>
 </html>
-

@@ -166,7 +166,7 @@ function crearTarjetaProducto(producto) {
             <div class="product-actions" onclick="event.stopPropagation()">
                 <i class="fas fa-heart ${estaEnFavoritos ? 'active' : ''}" 
                    data-product-id="${productId}" 
-                   style="${estaEnFavoritos ? 'color: #e74c3c;' : ''}"
+                   style="${estaEnFavoritos ? 'color: #3dba3d;' : ''}"
                    title="${estaEnFavoritos ? 'Eliminar de favoritos' : 'Agregar a favoritos'}"></i>
             </div>
         </div>

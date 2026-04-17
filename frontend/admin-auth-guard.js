@@ -26,12 +26,12 @@
     try {
         usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
     } catch (e) {
-        go('Index.html');
+        go('Login.html');
         return;
     }
 
     if (!usuario || !usuario.id) {
-        go('Index.html');
+        go('Login.html');
         return;
     }
 
@@ -61,6 +61,6 @@
             loadAdminScripts();
         })
         .catch(function () {
-            go('Index.html');
+            go('Login.html');
         });
 })();

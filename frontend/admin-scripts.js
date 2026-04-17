@@ -548,13 +548,13 @@ function initAdminPanelDeferred() {
             
             // Redirigir al login
             setTimeout(() => {
-                window.location.href = 'Index.html';
+                window.location.href = 'Login.html';
             }, 1500);
         } catch (error) {
             console.error('Error al cerrar sesión:', error);
             // Redirigir de todas formas
             localStorage.clear();
-            window.location.href = 'Index.html';
+            window.location.href = 'Login.html';
         }
     }
 
